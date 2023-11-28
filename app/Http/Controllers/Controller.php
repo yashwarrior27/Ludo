@@ -33,7 +33,8 @@ class Controller extends BaseController
         'MULTIPLE'=>'Amount must be multiple of 10.',
         'GAME_CREATE'=>'Game create successful.',
         'ALREADY_GAME'=>'Already in game.',
-        'INSUFFICIENT'=>'Insufficient balance.'
+        'INSUFFICIENT'=>'Insufficient balance.',
+        'UNAUTHORIZED'=>'Unauthorized user.'
     ];
 
     public function ErrorMessage($e){

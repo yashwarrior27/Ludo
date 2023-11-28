@@ -30,4 +30,11 @@ class User extends Authenticatable
      * @var array<string, string>
      */
 
+     public function TotalBalance()
+     {
+         return $this->deposit_wallet+$this->winning_wallet;
+     }
+
+
+
 }

@@ -42,6 +42,10 @@ Route::group(['middleware' => ['auth:api']],function(){
 
         Route::post('/set-game','SetGame');
         Route::get('/open-battle','OpenBattle');
+        Route::post('/play-game','PlayGame');
+        Route::get('/current-game','CurrentGame');
+        Route::post('/reject-game','RejectGame');
+        Route::post('/delete-game','DeleteGame');
     });
 
 });
