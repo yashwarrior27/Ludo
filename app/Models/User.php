@@ -32,7 +32,8 @@ class User extends Authenticatable
 
      public function TotalBalance()
      {
-         return $this->deposit_wallet+$this->winning_wallet;
+        //  return $this->deposit_wallet+$this->winning_wallet;
+        return 500;
      }
 
 

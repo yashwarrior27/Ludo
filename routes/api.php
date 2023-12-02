@@ -46,6 +46,7 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::get('/current-game','CurrentGame');
         Route::post('/reject-game','RejectGame');
         Route::post('/delete-game','DeleteGame');
+        Route::post('/start-game','StartGame');
     });
 
 });

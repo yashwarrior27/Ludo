@@ -34,7 +34,12 @@ class Controller extends BaseController
         'GAME_CREATE'=>'Game create successful.',
         'ALREADY_GAME'=>'Already in game.',
         'INSUFFICIENT'=>'Insufficient balance.',
-        'UNAUTHORIZED'=>'Unauthorized user.'
+       'UNAUTHORIZED'=>'Unauthorized user.',
+        'ALREADY_STARTED'=>'Already game started',
+        'MATCHING'=>'Matching is ongoing.',
+        'SOMETHING'=>'Something went wrong.',
+        'STARTED'=>'Game started. ',
+        'CANCELLED'=>'Game is cancelled'
     ];
 
     public function ErrorMessage($e){

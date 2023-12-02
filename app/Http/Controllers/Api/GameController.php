@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Game;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class GameController extends Controller
@@ -139,6 +141,7 @@ class GameController extends Controller
             {
                 $data[]=[
                     'type'=>0,
+                    'own_name'=>$game->AcceptedUser->username,
                     'amount'=>number_format($game->amount,3),
                     'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
                     'game_id'=>$game->id,
@@ -149,6 +152,7 @@ class GameController extends Controller
             {
                 $data[]=[
                     'type'=>1,
+                    'own_name'=>$game->CreatedUser->username,
                     'amount'=>number_format($game->amount,3),
                     'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
                     'game_id'=>$game->id,
@@ -228,5 +232,66 @@ class GameController extends Controller
              return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
          }
      }
+
+    public function StartGame(Request $request)
+    {
+        try
+        {  DB::beginTransaction();
+
+            $validator=Validator::make($request->all(),['game_id'=>'required|exists:games,id,deleted_at,NULL']);
+
+            if($validator->fails()) return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
+
+            $user=Auth::user();
+
+            $game=Game::findOrFail($request->game_id);
+
+            if($user->id != $game->created_id) return \ResponseBuilder::fail($this->messages['UNAUTHORIZED'],$this->badRequest);
+
+            if(empty($game->accepted_id)) return \ResponseBuilder::fail($this->messages['MATCHING'],$this->badRequest);
+
+            if($game->status=='5')
+               return \ResponseBuilder::fail($this->messages['CANCELLED'],$this->badRequest);
+
+            if($game->status!='0')
+               return \ResponseBuilder::fail($this->messages['ALREADY_STARTED'],$this->badRequest);
+
+           if($user->TotalBalance()<$game->amount || $game->AcceptedUser->TotalBalance()<$game->amount)
+           {
+               $game->comment='Insufficient Balance.';
+               $game->status='5';
+               $game->save();
+
+               DB::commit();
+               return \ResponseBuilder::fail($this->messages['SOMETHING'],$this->badRequest);
+           }
+
+             Transaction::insert([[
+                 'user_id'=>$game->created_id,
+                 'amount'=>$game->amount,
+                 'trans'=>  1,
+                 'type_id'=>$game->id,
+                 'type'=>'Play_Game',
+             ],[
+                'user_id'=>$game->accepted_id,
+                'amount'=>$game->amount,
+                'trans'=>  1,
+                'type_id'=>$game->id,
+                'type'=>'Play_Game',
+            ]]);
+
+            $game->status='1';
+            $game->save();
+
+            DB::commit();
+
+            return \ResponseBuilder::success($this->messages['STARTED'],$this->success);
+        }
+        catch(\Exception $e)
+        {
+            DB::rollBack();
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
 
 }
