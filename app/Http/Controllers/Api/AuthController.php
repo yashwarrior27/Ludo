@@ -154,4 +154,65 @@ class AuthController extends Controller
         }
     }
 
+    public function KYCUpdate(Request $request)
+    {
+        try
+        {
+            $validator=Validator::make($request->all(),[
+                      'aadhar_front'=>'required|image|size:5000',
+                      'aadhar_back'=>'required|image|size:5000',
+                      'upi_id'=>'required|regex:/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/',
+            ],['upi_id.regex'=>'Invalid UPI ID.']);
+
+            if($validator->fails())return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
+
+            $user=Auth::user();
+
+            $userdetail=UserDetail::where('user_id',$user->id)->first();
+
+            if($userdetail->status=='review')
+               return \ResponseBuilder::fail($this->messages['KYC_REVIEW'],$this->badRequest);
+
+            if($userdetail->status=='success')
+               return \ResponseBuilder::success($this->messages['KYC_COMPLETED'],$this->success);
+
+            $aadhar_front=$this->uploadDocuments($request->addhar_front,public_path('/assets/images/aadhar/'));
+            $aadhar_back=$this->uploadDocuments($request->addhar_back,public_path('/assets/images/aadhar/'));
+
+            $userdetail->aadhar_front=$aadhar_front;
+            $userdetail->aadhar_back=$aadhar_back;
+            $userdetail->upi_id=$request->upi_id;
+            $userdetail->save();
+
+        return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success);
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->badRequest);
+        }
+    }
+
+    public function KYCData()
+    {
+        try
+        {
+            $user=Auth::user();
+
+            $userdetail=UserDetail::where('user_id',$user->id)->first();
+
+            $data=[
+                'aadhar_front'=>!empty($userdetail->aadhar_front)?url("/assets/images/aadhar/{$user->aadhar_front}"):null,
+                'aadhar_back'=>!empty($userdetail->aadhar_back)?url("/assets/images/aadhar/{$user->aadhar_back}"):null,
+                'upi_id'=>$userdetail->upi_id,
+                'status'=>$userdetail->status
+            ];
+            return \ResponseBuilder::success($this->messages['SUCCESS'].$this->success,$data);
+
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
+
 }

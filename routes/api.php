@@ -35,7 +35,8 @@ Route::group(['middleware' => ['auth:api']],function(){
 
         Route::post('/change-username','ChangeUserName');
         Route::get('/user-profile','UserProfile');
-
+        Route::get('/kyc-data','KYCData');
+        Route::post('/set-kyc-data','KYCUpdate');
     });
 
     Route::controller(GameController::class)->group(function(){
@@ -47,6 +48,9 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::post('/reject-game','RejectGame');
         Route::post('/delete-game','DeleteGame');
         Route::post('/start-game','StartGame');
+        Route::get('/room-code','RoomCode');
+        Route::post('/set-room-code','SetRoomCode');
+        Route::post('/accept-room-code','AcceptRoomCode');
     });
 
 });

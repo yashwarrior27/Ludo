@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\GameResult;
 
 class GameController extends Controller
 {
@@ -129,7 +130,7 @@ class GameController extends Controller
 
             $user=Auth::user();
 
-            $games=Game::with('AcceptedUser','CreatedUser')->where('accepted_id',$user->id)->orWhere('created_id',$user->id)->where('status','<',4)->orderBy('id','Desc')->get();
+            $games=Game::with('AcceptedUser','CreatedUser')->whereNotIn('status',['4','5'])->where(function($query)use($user){return $query->where('accepted_id',$user->id)->orWhere('created_id',$user->id);})->orderBy('id','Desc')->get();
 
             if($games->count()==0)return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,[]);
 
@@ -281,6 +282,7 @@ class GameController extends Controller
             ]]);
 
             $game->status='1';
+            $game->room_code_timer=time()+300;
             $game->save();
 
             DB::commit();
@@ -294,4 +296,210 @@ class GameController extends Controller
         }
     }
 
+    public function RoomCode(Request $request)
+    {
+        try
+        {
+            $validator=Validator::make($request->all(),[
+                 'game_id'=>'required|exists:games,id,deleted_at,NULL',
+            ]);
+            if($validator->fails()) return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
+
+            $user=Auth::user();
+
+            $game=Game::findOrFail($request->game_id);
+
+            if($game->status==5)return \ResponseBuilder::fail($this->messages['CANCELLED'],$this->badRequest);
+
+            if($game->status==4) return \ResponseBuilder::fail($this->messages['COMPLETED'],$this->badRequest);
+
+            if($game->created_id==$user->id)
+            {
+                $data=[
+                    'own_name'=>$user->username,
+                    'user_name'=>$game->AcceptedUser->username,
+                    'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
+                    'status'=>$game->status,
+                    'type'=>1
+                ];
+
+                if(!empty($game->room_code))
+                {
+                    $data['room_code']=$game->room_code;
+
+                    if($game->status=='1')
+                    $data['accepter_timer']=$game->accepter_timer;
+
+                    return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$data);
+                }
+                else
+                {
+                    $data['room_code_timer']=$game->room_code_timer;
+
+                    return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$data);
+                }
+            }
+            else if($game->accepted_id==$user->id)
+            {
+                $data=[
+                    'own_name'=>$user->username,
+                    'user_name'=>$game->CreatedUser->username,
+                    'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
+                    'status'=>$game->status,
+                    'type'=>0
+                ];
+
+                if(!empty($game->room_code))
+                {
+                    if( (int) $game->status > 1)
+                       $data['room_code']=$game->room_code;
+                    else
+                      $data['accepter_timer']=$game->accepter_timer;
+
+                    return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$data);
+                }
+
+                else
+                {
+                    $data['room_code_timer']=$game->room_code_timer;
+
+                    return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$data);
+                }
+
+            }
+            else
+            {
+                return \ResponseBuilder::fail($this->messages['UNAUTHORIZED'],$this->badRequest);
+            }
+
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
+
+    public function SetRoomCode(Request $request)
+    {
+        try
+        {
+            $validator=Validator::make($request->all(),[
+                'game_id'=>'required|exists:games,id,deleted_at,NULL',
+                'room_code'=>'required|numeric|regex:/^0\d{7}$/'
+            ],['room_code.regex'=>'Invalid room code.']);
+
+            if($validator->fails())return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
+
+            $user=Auth::user();
+
+            $game=Game::where('id',$request->game_id)->where('status','1')->first();
+
+            if(!$game) return \ResponseBuilder::fail($this->messages['INVALID_GAME'],$this->badRequest);
+
+            if($game->created_id != $user->id) return \ResponseBuilder::fail($this->messages['UNAUTHORIZED'],$this->badRequest);
+
+            if(!empty($game->room_code)) return \ResponseBuilder::fail($this->messages['ALREADY_ROOM_CODE'],$this->badRequest);
+
+           $game->room_code=$request->room_code;
+           $game->accepter_timer=time()+120;
+           $game->save();
+
+           return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success);
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
+
+    public function AcceptRoomCode(Request $request)
+    {
+        try
+        {
+            $validator=Validator::make($request->all(),['game_id'=>'required|exists:games,id,deleted_at,NULL']);
+
+           if($validator->fails()) return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
+
+           $user=Auth::user();
+
+           $game=Game::where('id',$request->game_id)->where('status','1')->first();
+
+           if(!$game) return \ResponseBuilder::fail($this->messages['INVALID_GAME'],$this->badRequest);
+
+           if($game->accepted_id != $user->id || empty($game->room_code)) return \ResponseBuilder::fail($this->messages['UNAUTHORIZED'],$this->badRequest);
+
+           $game->status='2';
+           $game->save();
+
+           return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success);
+
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
+
+     public function StatusUpdate(Request $request)
+    {
+        try
+        {   DB::beginTransaction();
+
+            $validator=Validator::make($request->all(),[
+                'game_id'=>'required|exists:games,id,deleted_at,NULL',
+                'type'=>'required|in:W,L,C',
+                'image'=>'required_if:type,W|image|size:5000',
+                'reason'=>'required_if:type,C|string'
+            ]);
+
+            if($validator->fails())return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
+
+            $user=Auth::user();
+
+            $game=Game::findOrFail($request->game_id);
+
+            if($game->created_id!=$user->id && $game->accepted_id !=$user->id)
+               return \ResponseBuilder::fail($this->messages['UNAUTHORIZED'],$this->badRequest);
+
+            $gameResult=GameResult::where('game_id',$game->id)->where('user_id',$user->id)->first();
+
+            if($gameResult)
+                return \ResponseBuilder::fail($this->messages['ALREADY_STATUS'],$this->badRequest);
+
+             if($request->type=='C')
+             {
+
+
+
+             }
+             else
+             {
+                if($game->status!='2' && $game->status!='3')
+                return \ResponseBuilder::fail($this->messages['INVALID_STATUS'],$this->badRequest);
+
+                if($request->type=='L')
+                {
+                     GameResult::create([
+                       'game_id'=>$game->id,
+                       'user_id'=>$user->id,
+                       'status'=>'lose',
+                     ]);
+
+                     $game->status='3';
+                     $game->save();
+                 }else
+                 {
+
+
+                 }
+
+             }
+
+        }
+        catch(\Exception $e)
+        {
+            DB::rollBack();
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
 }

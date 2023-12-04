@@ -39,7 +39,14 @@ class Controller extends BaseController
         'MATCHING'=>'Matching is ongoing.',
         'SOMETHING'=>'Something went wrong.',
         'STARTED'=>'Game started. ',
-        'CANCELLED'=>'Game is cancelled'
+        'CANCELLED'=>'Game is cancelled',
+        'INVALID_GAME'=>'Game is invalid.',
+        'ALREADY_ROOM_CODE'=>'Already have a room code.',
+        'COMPLETED'=>'Game is completed.',
+        'INVALID_STATUS'=>'Invalid game status.',
+        'ALREADY_STATUS'=>'Already status updated.',
+        'KYC_REVIEW'=>'Details in under review.',
+        'KYC_COMPLETED'=>'KYC is completed.'
     ];
 
     public function ErrorMessage($e){
