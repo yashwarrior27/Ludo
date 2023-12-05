@@ -159,8 +159,8 @@ class AuthController extends Controller
         try
         {
             $validator=Validator::make($request->all(),[
-                      'aadhar_front'=>'required|image|size:5000',
-                      'aadhar_back'=>'required|image|size:5000',
+                      'aadhar_front'=>'required|image|max:5000',
+                      'aadhar_back'=>'required|image|max:5000',
                       'upi_id'=>'required|regex:/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/',
             ],['upi_id.regex'=>'Invalid UPI ID.']);
 

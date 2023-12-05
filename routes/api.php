@@ -51,6 +51,7 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::get('/room-code','RoomCode');
         Route::post('/set-room-code','SetRoomCode');
         Route::post('/accept-room-code','AcceptRoomCode');
+        Route::post('/set-game-status','StatusUpdate');
     });
 
 });

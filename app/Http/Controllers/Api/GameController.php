@@ -320,8 +320,19 @@ class GameController extends Controller
                     'user_name'=>$game->AcceptedUser->username,
                     'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
                     'status'=>$game->status,
-                    'type'=>1
+                    'type'=>1,
+                    'result'=>0
                 ];
+
+                $gameresult=GameResult::where('game_id',$game->id)->where('user_id',$user->id)->first();
+
+                if($gameresult)
+                {
+                    $data['result']=1;
+                    $data['result_status']=$gameresult->status;
+                    $data['result_reason']=$gameresult->reason;
+                    $data['result_time']=$gameresult->created_at;
+                }
 
                 if(!empty($game->room_code))
                 {
@@ -346,8 +357,19 @@ class GameController extends Controller
                     'user_name'=>$game->CreatedUser->username,
                     'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
                     'status'=>$game->status,
-                    'type'=>0
+                    'type'=>0,
+                    'result'=>0
                 ];
+
+                $gameresult=GameResult::where('game_id',$game->id)->where('user_id',$user->id)->first();
+
+                if($gameresult)
+                {
+                    $data['result']=1;
+                    $data['result_status']=$gameresult->status;
+                    $data['result_reason']=$gameresult->reason;
+                    $data['result_time']=$gameresult->created_at;
+                }
 
                 if(!empty($game->room_code))
                 {
@@ -440,7 +462,7 @@ class GameController extends Controller
         }
     }
 
-     public function StatusUpdate(Request $request)
+    public function StatusUpdate(Request $request)
     {
         try
         {   DB::beginTransaction();
@@ -448,7 +470,7 @@ class GameController extends Controller
             $validator=Validator::make($request->all(),[
                 'game_id'=>'required|exists:games,id,deleted_at,NULL',
                 'type'=>'required|in:W,L,C',
-                'image'=>'required_if:type,W|image|size:5000',
+                'image'=>'required_if:type,W|image|max:5000',
                 'reason'=>'required_if:type,C|string'
             ]);
 
@@ -457,6 +479,9 @@ class GameController extends Controller
             $user=Auth::user();
 
             $game=Game::findOrFail($request->game_id);
+
+            if($game->status=='4' || $game->status=='5')
+               return \ResponseBuilder::fail($this->messages['ALREADY_STATUS'],$this->badRequest);
 
             if($game->created_id!=$user->id && $game->accepted_id !=$user->id)
                return \ResponseBuilder::fail($this->messages['UNAUTHORIZED'],$this->badRequest);
@@ -468,8 +493,23 @@ class GameController extends Controller
 
              if($request->type=='C')
              {
+                 $gameresult=GameResult::where('game_id',$game->id)->first();
+
+                 GameResult::create([
+                      'game_id'=>$game->id,
+                      'user_id'=>$user->id,
+                      'status'=>'cancel'
+                 ]);
 
 
+              if($game->status=='1' || ($gameresult && $gameresult->status=='cancel'))
+              {
+                  $game->status='5';
+                  $game->comment=$request->reason;
+                  $game->save();
+
+                Transaction::where('trans',1)->where('type_id',$game->id)->update(['status'=>0]);
+              }
 
              }
              else
@@ -477,23 +517,80 @@ class GameController extends Controller
                 if($game->status!='2' && $game->status!='3')
                 return \ResponseBuilder::fail($this->messages['INVALID_STATUS'],$this->badRequest);
 
+                $gameresult=GameResult::where('game_id',$game->id)->first();
+
+
                 if($request->type=='L')
                 {
-                     GameResult::create([
-                       'game_id'=>$game->id,
-                       'user_id'=>$user->id,
-                       'status'=>'lose',
-                     ]);
+                    GameResult::create([
+                        'game_id'=>$game->id,
+                        'user_id'=>$user->id,
+                        'status'=>'lose',
+                      ]);
 
+                    if(!$gameresult){
                      $game->status='3';
                      $game->save();
-                 }else
+                    }
+                    else
+                    {
+                        if($gameResult->status=='win')
+                        {
+                            $game->status='4';
+                            $game->winner_id=$gameresult->user_id;
+                            $game->save();
+
+                            Transaction::create([
+                            'user_id'=>$gameresult->user_id,
+                            'amount'=>$game->amount+($game->amount-($game->amount*$this->feeper/100)),
+                            'trans'=>'3',
+                            'type_id'=>$game->id,
+                            'type'=>'Game_Win',
+                            ]);
+                        }
+                    }
+                 }
+                 else
                  {
 
+                    $wimage=$this->uploadDocuments($request->image,public_path('/assets/images/win_game/'));
 
+                    GameResult::create([
+                        'game_id'=>$game->id,
+                        'user_id'=>$user->id,
+                        'status'=>'win',
+                        'image'=>$wimage
+                    ]);
+
+                    if(!$gameresult){
+                        $game->status='3';
+                        $game->save();
+                       }
+                       else
+                       {
+                           if($gameresult->status=='lose')
+                           {
+
+                            $game->status='4';
+                            $game->winner_id=$user->id;
+                            $game->save();
+
+                            Transaction::create([
+                                'user_id'=>$user->id,
+                                'amount'=>$game->amount+($game->amount-($game->amount*$this->feeper/100)),
+                                'trans'=>'3',
+                                'type_id'=>$game->id,
+                                'type'=>'Game_Win',
+                                ]);
+                           }
+
+                       }
                  }
 
              }
+             DB::commit();
+
+             return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success);
 
         }
         catch(\Exception $e)
