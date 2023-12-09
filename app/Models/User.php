@@ -32,8 +32,17 @@ class User extends Authenticatable
 
      public function TotalBalance()
      {
-        //  return $this->deposit_wallet+$this->winning_wallet;
-        return 500;
+        $totalBalance=Transaction::where('user_id',$this->id)
+        ->whereIn('trans',['0','2','3','4'])
+        ->where('status',1)
+        ->sum('amount');
+
+        $totalWithdrawal=Transaction::where('user_id',$this->id)
+        ->whereIn('trans',['1','5','6'])
+        ->where('status',1)
+        ->sum('amount');
+
+        return (float)$totalBalance - (float)$totalWithdrawal;
      }
 
 

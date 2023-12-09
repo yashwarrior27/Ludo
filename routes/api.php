@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +29,7 @@ Route::controller(AuthController::class)->group(function(){
 Route::controller(AssetController::class)->group(function(){
 
 Route::get('/categories','Categories');
+
 });
 
 Route::group(['middleware' => ['auth:api']],function(){
@@ -37,6 +40,9 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::get('/user-profile','UserProfile');
         Route::get('/kyc-data','KYCData');
         Route::post('/set-kyc-data','KYCUpdate');
+        Route::get('/referral-data','GetReferralData');
+        Route::get('/wallet-balance','WalletBalance');
+
     });
 
     Route::controller(GameController::class)->group(function(){
@@ -52,6 +58,20 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::post('/set-room-code','SetRoomCode');
         Route::post('/accept-room-code','AcceptRoomCode');
         Route::post('/set-game-status','StatusUpdate');
+        Route::get('/running-battle','RunningBattle');
+    });
+
+
+    Route::controller(PaymentController::class)->group(function(){
+
+       Route::get('/deposit-data','DepositData');
+       Route::post('/make-deposit','MakeDeposit');
+
+    });
+
+    Route::controller(ReportController::class)->group(function(){
+
+        Route::get('/referral-report','ReferralReport');
     });
 
 });

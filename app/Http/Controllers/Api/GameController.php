@@ -509,6 +509,10 @@ class GameController extends Controller
                   $game->save();
 
                 Transaction::where('trans',1)->where('type_id',$game->id)->update(['status'=>0]);
+              }else
+              {
+                 $game->status='3';
+                 $game->save();
               }
 
              }
@@ -547,6 +551,19 @@ class GameController extends Controller
                             'type_id'=>$game->id,
                             'type'=>'Game_Win',
                             ]);
+
+                            $gUser=User::where('id',$gameresult->user_id)->first();
+
+                            if(!empty($gUser->parent_id))
+                            {
+                                Transaction::create([
+                                    'user_id'=>$gUser->parent_id,
+                                    'amount'=>$game->amount*($this->referral/100),
+                                    'trans'=>'4',
+                                    'type_id'=>$game->id,
+                                    'type'=>'Referral_Bonus'
+                                    ]);
+                            }
                         }
                     }
                  }
@@ -582,6 +599,18 @@ class GameController extends Controller
                                 'type_id'=>$game->id,
                                 'type'=>'Game_Win',
                                 ]);
+
+
+                            if(!empty($user->parent_id))
+                            {
+                                Transaction::create([
+                                    'user_id'=>$user->parent_id,
+                                    'amount'=>$game->amount*($this->referral/100),
+                                    'trans'=>'4',
+                                    'type_id'=>$game->id,
+                                    'type'=>'Referral_Bonus'
+                                    ]);
+                            }
                            }
 
                        }
@@ -596,6 +625,31 @@ class GameController extends Controller
         catch(\Exception $e)
         {
             DB::rollBack();
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
+
+     public function RunningBattle(Request $request)
+    {
+        try
+        {
+            $validator=Validator::make($request->all(),[
+                'category_id'=>'required|exists:categories,id'
+            ]);
+
+            if($validator->fails())return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
+
+              $paginate=isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
+
+              $game=Game::selectRaw("cuser.username as created_user,auser.username as accepted_user,games.amount as amount,CAST((games.amount + (games.amount-(games.amount*{$this->feeper}/100))) AS DECIMAL(20,3)) as prize")->join(DB::raw('users as cuser'),'games.created_id','cuser.id')->join(DB::raw('users as auser'),'games.accepted_id','auser.id')->whereIn('games.status',['1','2'])->orderBy('games.id','Desc')->paginate($paginate);
+
+            $data=$game->toArray()['data'];
+
+            return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$game,$data);
+
+        }
+        catch(\Exception $e)
+        {
             return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
         }
     }

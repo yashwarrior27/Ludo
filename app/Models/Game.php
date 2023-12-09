@@ -20,4 +20,8 @@ class Game extends Model
     {
         return $this->hasOne(User::class,'id','accepted_id');
     }
+    public function Winner()
+    {
+        return $this->hasOne(User::class,'id','winner_id');
+    }
 }

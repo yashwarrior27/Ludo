@@ -21,6 +21,7 @@ class Controller extends BaseController
     protected $partialContent = 206;
 
     protected $feeper=5;
+    protected $referral=3;
 
     protected $messages=[
         'OTP_SUCCESS'=>'OTP send successful.',
@@ -46,7 +47,9 @@ class Controller extends BaseController
         'INVALID_STATUS'=>'Invalid game status.',
         'ALREADY_STATUS'=>'Already status updated.',
         'KYC_REVIEW'=>'Details in under review.',
-        'KYC_COMPLETED'=>'KYC is completed.'
+        'KYC_COMPLETED'=>'KYC is completed.',
+        'NO_DATA'=>'No data found.',
+        'ALREADY_PENDING'=>'Already have pending request.'
     ];
 
     public function ErrorMessage($e){
@@ -56,6 +59,7 @@ class Controller extends BaseController
 
     public function uploadDocuments($files, $path)
     {
+
         $imageName = substr(time(),-5). $files->getClientOriginalName();
         $files->move($path, $imageName);
         return $imageName;
