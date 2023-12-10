@@ -542,6 +542,7 @@ class GameController extends Controller
                         {
                             $game->status='4';
                             $game->winner_id=$gameresult->user_id;
+                            $game->winner_amount=$game->amount+($game->amount-($game->amount*$this->feeper/100));
                             $game->save();
 
                             Transaction::create([
@@ -590,6 +591,7 @@ class GameController extends Controller
 
                             $game->status='4';
                             $game->winner_id=$user->id;
+                            $game->winner_amount=$game->amount+($game->amount-($game->amount*$this->feeper/100));
                             $game->save();
 
                             Transaction::create([

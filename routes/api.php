@@ -72,6 +72,8 @@ Route::group(['middleware' => ['auth:api']],function(){
     Route::controller(ReportController::class)->group(function(){
 
         Route::get('/referral-report','ReferralReport');
+        Route::get('/game-report','GameReport');
+        Route::get('/deposit-report','DepositReport');
     });
 
 });

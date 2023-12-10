@@ -42,8 +42,9 @@
       21 => 'Illuminate\\View\\ViewServiceProvider',
       22 => 'App\\Providers\\AppServiceProvider',
       23 => 'App\\Providers\\AuthServiceProvider',
-      24 => 'App\\Providers\\EventServiceProvider',
-      25 => 'App\\Providers\\RouteServiceProvider',
+      24 => 'App\\Providers\\BroadcastServiceProvider',
+      25 => 'App\\Providers\\EventServiceProvider',
+      26 => 'App\\Providers\\RouteServiceProvider',
     ),
     'aliases' => 
     array (
@@ -71,6 +72,7 @@
       'Log' => 'Illuminate\\Support\\Facades\\Log',
       'Mail' => 'Illuminate\\Support\\Facades\\Mail',
       'Notification' => 'Illuminate\\Support\\Facades\\Notification',
+      'Number' => 'Illuminate\\Support\\Number',
       'Password' => 'Illuminate\\Support\\Facades\\Password',
       'Process' => 'Illuminate\\Support\\Facades\\Process',
       'Queue' => 'Illuminate\\Support\\Facades\\Queue',
@@ -136,23 +138,22 @@
   ),
   'broadcasting' => 
   array (
-    'default' => 'log',
+    'default' => 'pusher',
     'connections' => 
     array (
       'pusher' => 
       array (
         'driver' => 'pusher',
-        'key' => '',
-        'secret' => '',
-        'app_id' => '',
+        'key' => 'ludobazar1',
+        'secret' => 'ludobazar1',
+        'app_id' => '123456789',
         'options' => 
         array (
           'cluster' => 'mt1',
-          'host' => 'api-mt1.pusher.com',
-          'port' => '443',
-          'scheme' => 'https',
+          'host' => '127.0.0.1',
+          'port' => 6001,
+          'scheme' => 'http',
           'encrypted' => true,
-          'useTLS' => true,
         ),
         'client_options' => 
         array (
@@ -718,6 +719,53 @@
       0 => 'E:\\software\\projects\\LudoBazar\\resources\\views',
     ),
     'compiled' => 'E:\\software\\projects\\LudoBazar\\storage\\framework\\views',
+  ),
+  'websockets' => 
+  array (
+    'dashboard' => 
+    array (
+      'port' => 6001,
+    ),
+    'apps' => 
+    array (
+      0 => 
+      array (
+        'id' => '123456789',
+        'name' => 'LudoBazar',
+        'key' => 'ludobazar1',
+        'secret' => 'ludobazar1',
+        'path' => NULL,
+        'capacity' => NULL,
+        'enable_client_messages' => false,
+        'enable_statistics' => true,
+      ),
+    ),
+    'app_provider' => 'BeyondCode\\LaravelWebSockets\\Apps\\ConfigAppProvider',
+    'allowed_origins' => 
+    array (
+    ),
+    'max_request_size_in_kb' => 250,
+    'path' => 'laravel-websockets',
+    'middleware' => 
+    array (
+      0 => 'web',
+      1 => 'BeyondCode\\LaravelWebSockets\\Dashboard\\Http\\Middleware\\Authorize',
+    ),
+    'statistics' => 
+    array (
+      'model' => 'BeyondCode\\LaravelWebSockets\\Statistics\\Models\\WebSocketsStatisticsEntry',
+      'logger' => 'BeyondCode\\LaravelWebSockets\\Statistics\\Logger\\HttpStatisticsLogger',
+      'interval_in_seconds' => 60,
+      'delete_statistics_older_than_days' => 60,
+      'perform_dns_lookup' => false,
+    ),
+    'ssl' => 
+    array (
+      'local_cert' => NULL,
+      'local_pk' => NULL,
+      'passphrase' => NULL,
+    ),
+    'channel_manager' => 'BeyondCode\\LaravelWebSockets\\WebSockets\\Channels\\ChannelManagers\\ArrayChannelManager',
   ),
   'passport' => 
   array (
