@@ -66,6 +66,7 @@ Route::group(['middleware' => ['auth:api']],function(){
 
        Route::get('/deposit-data','DepositData');
        Route::post('/make-deposit','MakeDeposit');
+       Route::post('/withdrawal-request','Withdrawal');
 
     });
 
@@ -74,6 +75,8 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::get('/referral-report','ReferralReport');
         Route::get('/game-report','GameReport');
         Route::get('/deposit-report','DepositReport');
+        Route::get('/transaction-report','TransactionReport');
+        Route::get('/penalty-report','PenaltyReport');
     });
 
 });

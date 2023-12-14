@@ -34,7 +34,7 @@ class GameController extends Controller
             if($validator->fails())return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
 
             if((int)$request->amount%10!=0)
-             return \ResponseBuilder::fail($this->messages['MULTIPLE'],$this->badRequest);
+             return \ResponseBuilder::fail($this->messages['MULTIPLE'].'10.',$this->badRequest);
 
             if($user->TotalBalance()<$request->amount)
                return \ResponseBuilder::fail($this->messages['INSUFFICIENT'],$this->badRequest);
@@ -538,7 +538,7 @@ class GameController extends Controller
                     }
                     else
                     {
-                        if($gameResult->status=='win')
+                        if($gameresult->status=='win')
                         {
                             $game->status='4';
                             $game->winner_id=$gameresult->user_id;
@@ -643,7 +643,7 @@ class GameController extends Controller
 
               $paginate=isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
 
-              $game=Game::selectRaw("cuser.username as created_user,auser.username as accepted_user,games.amount as amount,CAST((games.amount + (games.amount-(games.amount*{$this->feeper}/100))) AS DECIMAL(20,3)) as prize")->join(DB::raw('users as cuser'),'games.created_id','cuser.id')->join(DB::raw('users as auser'),'games.accepted_id','auser.id')->whereIn('games.status',['1','2'])->orderBy('games.id','Desc')->paginate($paginate);
+              $game=Game::selectRaw("cuser.username as created_user,auser.username as accepted_user,games.amount as amount,CAST((games.amount + (games.amount-(games.amount*{$this->feeper}/100))) AS DECIMAL(20,3)) as prize")->join(DB::raw('users as cuser'),'games.created_id','cuser.id')->join(DB::raw('users as auser'),'games.accepted_id','auser.id')->whereIn('games.status',['1','2','3'])->orderBy('games.id','Desc')->paginate($paginate);
 
             $data=$game->toArray()['data'];
 

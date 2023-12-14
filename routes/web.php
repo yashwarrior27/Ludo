@@ -1,6 +1,10 @@
 <?php
 
-use App\Events\OpenBattle;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DepositController;
+use App\Http\Controllers\Admin\GameController;
+use App\Http\Controllers\Admin\IndexController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,14 +18,40 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::controller(IndexController::class)->group(function(){
+
+Route::get('/','Index');
+Route::post('/login','Login');
+Route::get('/logout','Logout');
+
 });
 
-Auth::routes();
+Route::group(['middleware' => ['auth']], function () {
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::controller(DashboardController::class)->group(function(){
 
-Route::get('/test',function(){
- event( new OpenBattle);
+        Route::get('/dashboard','Index');
+    });
+
+    Route::controller(DepositController::class)->group(function(){
+
+        Route::get('/deposits','Index');
+        Route::get('/deposit-edit/{deposit}','EditDeposit');
+        Route::post('/deposit-edit/{deposit}','UpdateDeposit');
+    });
+
+    Route::controller(GameController::class)->group(function(){
+        Route::get('/games','Index');
+        Route::get('/game-detail/{game}','GameDetail');
+    });
+
+});
+
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    Artisan::call('config:clear');
+
+    return "cache is clear";
 });

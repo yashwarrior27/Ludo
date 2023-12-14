@@ -137,28 +137,4 @@
             </div>
         </div>
     </body>
-    {{-- /* @vite('resources/js/app.js') */ --}}
-
-
-    <script type="module">
-        import Echo from 'https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.3/echo.js';
-        import pusherJs from 'https://cdn.jsdelivr.net/npm/pusher-js@8.4.0-rc2/+esm';
-
-        window.Pusher = pusherJs;
-
-        window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key:'ludobazar1',
-    cluster:'mt1',
-    wsHost: window.location.hostname,
-    wsPort:6001,
-    forceTLS:false,
-    disableStatus:true,
-
-});
-
-    window.Echo.channel('GameBattle').listen('.OpenBattle',function(e){
-        console.log(e);
-    })
-    </script>
 </html>

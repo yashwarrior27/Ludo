@@ -10,7 +10,7 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+    {   if(!Schema::hasTable('deposits'))
         Schema::create('deposits', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id');

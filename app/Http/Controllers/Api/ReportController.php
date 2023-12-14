@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Deposit;
-use App\Models\Game;
 use App\Models\Transaction;
+use App\Models\Deposit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Game;
 
 class ReportController extends Controller
 {
@@ -18,6 +18,7 @@ class ReportController extends Controller
         $paginate=isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
 
         $user=Auth::user();
+
 
           $reports=Transaction::with('Game','Game.Winner')
           ->where('trans',4)
@@ -42,7 +43,7 @@ class ReportController extends Controller
         }
     }
 
-    public function GameReport(Request $request)
+     public function GameReport(Request $request)
     {
         try
         {
@@ -99,13 +100,14 @@ class ReportController extends Controller
 
             $deposits=Deposit::with('Deposit','Bonus')->where('user_id',$user->id)->orderBy('id','Desc')->paginate($paginate);
 
-            $data=$deposits->map(function($collect){
+          $data=$deposits->map(function($collect){
 
                if($collect->status=='success')
                  return [
                 'deposit_id'=>$collect->id,
                 'amount'=>$collect->Deposit->amount,
                 'bonus'=>$collect->Bonus->amount,
+                'comment'=>$collect->comment,
                 'timestamp'=>$collect->created_at
                  ];
                  else
@@ -118,12 +120,69 @@ class ReportController extends Controller
             });
 
             return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$deposits,$data);
-
         }
         catch(\Exception $e)
         {
             return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
         }
 
+    }
+
+
+    public function TransactionReport(Request $request)
+    {
+        try
+        {
+            $paginate=isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
+
+            $user=Auth::user();
+
+            $transactions=Transaction::where('user_id',$user->id)->orderBy('id','Desc')->paginate($paginate);
+
+            $data=$transactions->map(function($collect){
+                 return [
+                     'transaction_type'=>$collect->trans,
+                     'type'=>$collect->type,
+                     'amount'=>$collect->amount,
+                     'status'=>$collect->status,
+                     'timestamp'=>$collect->created_at
+                 ];
+            });
+
+        return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$transactions,$data);
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
+
+    public function PenaltyReport(Request $request)
+    {
+        try
+        {
+            $paginate=isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
+
+            $user=Auth::user();
+
+          $penality=Transaction::where('user_id',$user->id)->where('trans','5')->orderBy('id','Desc')->paginate($paginate);
+
+          $data=$penality->map(function($collect){
+              return[
+                  'amount'=>$collect->amount,
+                  'game_id'=>$collect->type_id,
+                  'reason'=>$collect->type,
+                  'timestamp'=>$collect->created_at
+            ];
+
+          });
+
+          return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$penality,$data);
+
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
     }
 }

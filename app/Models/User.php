@@ -30,7 +30,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
 
-     public function TotalBalance()
+    public function TotalBalance()
      {
         $totalBalance=Transaction::where('user_id',$this->id)
         ->whereIn('trans',['0','2','3','4'])
@@ -42,9 +42,20 @@ class User extends Authenticatable
         ->where('status',1)
         ->sum('amount');
 
-        return (float)$totalBalance - (float)$totalWithdrawal;
+        // return (float)$totalBalance-(float)$totalWithdrawal;
+        return 500;
      }
 
+    public function WithdrawalableAmount()
+    {
+       $totalBalance=(float) $this->TotalBalance();
 
+      $totalWin=(float) Transaction::where('user_id',$this->id)
+      ->where('trans','3')
+      ->where('status',1)
+      ->sum('amount');
+
+       return $totalBalance>($totalBalance-$totalWin)?$totalBalance-($totalBalance-$totalWin):0;
+    }
 
 }

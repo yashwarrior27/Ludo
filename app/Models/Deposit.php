@@ -10,7 +10,7 @@ class Deposit extends Model
     use HasFactory;
     protected $guarded=[];
 
-    public function Deposit()
+     public function Deposit()
     {
            return $this->hasOne(Transaction::class,'type_id','id')->where('trans',0);
     }
@@ -18,5 +18,10 @@ class Deposit extends Model
     public function Bonus()
     {
         return $this->hasOne(Transaction::class,'type_id','id')->where('trans',2);
+    }
+
+    public function User()
+    {
+        return $this->hasOne(User::class,'id','user_id');
     }
 }

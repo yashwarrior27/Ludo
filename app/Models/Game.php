@@ -24,4 +24,14 @@ class Game extends Model
     {
         return $this->hasOne(User::class,'id','winner_id');
     }
+
+    public function Category()
+    {
+        return $this->hasOne(Category::class,'id','category_id');
+    }
+
+    public function GameResult()
+    {
+        return $this->hasMany(GameResult::class,'game_id','id');
+    }
 }
