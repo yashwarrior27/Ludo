@@ -14,4 +14,9 @@ class Transaction extends Model
     {
         return $this->hasOne(Game::class,'id','type_id');
     }
+
+    public function User()
+    {
+        return $this->hasOne(User::class,'id','user_id');
+    }
 }

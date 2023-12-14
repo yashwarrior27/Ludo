@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::controller(GameController::class)->group(function(){
         Route::get('/games','Index');
         Route::get('/game-detail/{game}','GameDetail');
+        Route::post('/game-detail/{game}','GameDetailUpdate');
     });
 
 });

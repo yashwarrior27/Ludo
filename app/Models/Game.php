@@ -34,4 +34,9 @@ class Game extends Model
     {
         return $this->hasMany(GameResult::class,'game_id','id');
     }
+
+    public function Penalty()
+    {
+        return $this->hasOne(Transaction::class,'type_id','id')->where('trans','5');
+    }
 }
