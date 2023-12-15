@@ -98,7 +98,7 @@
                         <td class="text-center">{{date('d-m-Y',strtotime($item?->created_at))??'-'}}</td>
                         <td>
                             @if ($item?->status=='0')
-                            <a href="" class="btn btn-sm btn-danger" >Delete</a>
+                            <button onclick="if(confirm('Do you want to delete?'))window.location.href='{{url("/game-delete/{$item?->id}")}}'" class="btn btn-sm btn-danger" >Delete</button>
                             @elseif($item?->status=='4' || $item?->status=='5' )
                             <a href="{{url("/game-detail/{$item?->id}")}}" class="btn btn-sm btn-warning" >View</a>
                             @else

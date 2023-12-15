@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepositController;
 use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\IndexController;
+use App\Http\Controllers\Admin\WithdrawalController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +46,22 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/games','Index');
         Route::get('/game-detail/{game}','GameDetail');
         Route::post('/game-detail/{game}','GameDetailUpdate');
+        Route::get('/game-delete/{game}','GameDelete');
+    });
+
+    Route::controller(WithdrawalController::class)->group(function(){
+       Route::get('/withdrawals','Index');
+       Route::get('/withdrawal-edit/{withdrawal}','WithdrawalEdit');
+       Route::post('/withdrawal-edit/{withdrawal}','WithdrawalUpdate');
+    });
+
+    Route::controller(CategoryController::class)->group(function(){
+
+        Route::get('/categories','Index');
+        Route::get('/category-create','CategoryCreate');
+        Route::post('/category-create','CategoryStore');
+        Route::get('/category-edit/{category}','CategoryEdit');
+
     });
 
 });

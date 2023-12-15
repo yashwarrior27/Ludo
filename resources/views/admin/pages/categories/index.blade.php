@@ -12,6 +12,10 @@
                 <h3 class="m-0">{{$title ?? 'title'}}</h3>
             </div>
 
+            <div class="col-2">
+                <a href="{{url('/category-create')}}" class="btn  btn-success">Create</a>
+            </div>
+
         </div>
     </div>
  </div>
@@ -39,9 +43,8 @@
                             <div class="col-4">
                                 <select name="filter" class="form-select" onchange="document.getElementById('search-form').submit()">
                                     <option value="">Select Status</option>
-                                    <option value="pending" {{request()->query('filter')=='pending'?'selected':''}}>Pending</option>
-                                    <option value="success" {{request()->query('filter')=='pending'?'selected':''}}>Success</option>
-                                    <option value="rejected" {{request()->query('filter')=='pending'?'selected':''}}>Rejected</option>
+                                    <option value="1" {{request()->query('filter')=='1'?'selected':''}}>Acitve</option>
+                                    <option value="0" {{request()->query('filter')=='0'?'selected':''}}>De-Active</option>
                                 </select>
                             </div>
 
@@ -61,13 +64,9 @@
                 <thead class="">
                   <tr>
                     <th scope="col" class="text-center">Sr No.</th>
-                    <th scope="col" class="text-center">Mobile No.</th>
-                    <th scope="col" class="text-center">UPI ID</th>
-                    <th scope="col" class="text-center">Amount</th>
-                    <th scope="col" class="text-center">Status</th>
-                    <th scope="col" class="text-center">Transaction Id</th>
-                    <th scope="col" class="text-center">Comment</th>
-                    <th scope="col" class="text-center">Date</th>
+                    <th scope="col" class="text-center">Name</th>
+                    <th scope="col" class="text-center">image</th>
+                    <th scope="col" class="text-center">status</th>
                     <th scope="col" class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -76,23 +75,14 @@
                     @foreach ($data as $key => $item)
                     <tr>
                         <th class="text-center">{{$key+1??'-'}}</th>
-                        <td class="text-center">{{$item?->User?->mobile??'-'}}</td>
-                        <td class="text-center">{{$item?->User?->UserDetail?->upi_id??'-'}}</td>
-                        <td class="text-center">{{$item?->amount??'-'}}</td>
+                        <td class="text-center">{{$item?->name??'-'}}</td>
                         <td class="text-center">
-                            @if ($item?->status=='pending')
-                             <span class="badge bg-warning">Pending</span>
-                             @elseif ($item?->status=='success')
-                             <span class="badge bg-success">Success</span>
-                             @else
-                             <span class="badge bg-danger" >Rejected</span>
-                            @endif
+                        <img src="{{url("/assets/images/{$item?->image}")}}" class="img-fluid w-25" alt="">
                         </td>
-                        <td class="text-center">{{$item?->transaction_id??'-'}}</td>
-                        <td class="text-center">{{$item?->comment??'-'}}</td>
-                          <td class="text-center">{{date('d-m-Y',strtotime($item?->created_at))??'-'}}</td>
+                        <td class="text-center">{!!$item?->status==1?'<span class="badge bg-success">Active</span>':'<span class="badge bg-danger">De-Active</span>'!!}</td>
+
                         <td>
-                           <a href="{{url("/withdrawal-edit/{$item->id}")}}" class="btn btn-sm btn-warning" style="{{$item?->status!='pending'?'pointer-events:none;opacity:.6;':''}}" >Edit</a>
+                           <a href="{{url("/category-edit/{$item->id}")}}" class="btn btn-sm btn-warning" >Edit</a>
                         </td>
                     </tr>
                     </div>

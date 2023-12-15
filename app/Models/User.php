@@ -58,4 +58,8 @@ class User extends Authenticatable
        return $totalBalance>($totalBalance-$totalWin)?$totalBalance-($totalBalance-$totalWin):0;
     }
 
+    public function UserDetail()
+    {
+        return $this->hasOne(UserDetail::class,'user_id','id');
+    }
 }

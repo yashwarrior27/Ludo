@@ -407,14 +407,17 @@ class GameController extends Controller
         {
             $validator=Validator::make($request->all(),[
                 'game_id'=>'required|exists:games,id,deleted_at,NULL',
-                'room_code'=>'required|numeric|regex:/^0\d{7}$/'
-            ],['room_code.regex'=>'Invalid room code.']);
+                'room_code'=>'required|numeric'
+            ]);
 
             if($validator->fails())return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
 
             $user=Auth::user();
 
             $game=Game::where('id',$request->game_id)->where('status','1')->first();
+
+            if(preg_match("/^{($game->category_id-1)}\d{7}$/",$request->room_code)!=1)
+               return \ResponseBuilder::fail('Invalid room code.',$this->badRequest);
 
             if(!$game) return \ResponseBuilder::fail($this->messages['INVALID_GAME'],$this->badRequest);
 

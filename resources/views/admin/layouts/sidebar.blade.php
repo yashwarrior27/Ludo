@@ -32,5 +32,17 @@
           <div data-i18n="Analytics">Games</div>
         </a>
       </li>
+      <li class="menu-item  {{ request()->segment(1)=='withdrawals' ?'active': '' }}">
+        <a href="{{url("/withdrawals")}}" class="menu-link">
+            <i class='menu-icon tf-icons bx bx-transfer'></i>
+          <div data-i18n="Analytics">Withdrawals</div>
+        </a>
+      </li>
+      <li class="menu-item  {{ request()->segment(1)=='categories' ?'active': '' }}">
+        <a href="{{url("/categories")}}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-category-alt'></i>
+          <div data-i18n="Analytics">Categories</div>
+        </a>
+      </li>
     </ul>
   </aside>

@@ -2,7 +2,7 @@
 @section('content')
 <div class="row justify-content-center">
     <div class="col-10 ">
-        <div class="card border-bottom {{explode(' ',$title)[1]=='Edit'?'border-warning':'border-success'}}">
+        <div class="card border-bottom border-primary">
            <div class="card-body p-0 p-3">
                <div class="row">
                    <div class="col-10">
@@ -13,29 +13,30 @@
         </div>
        </div>
        <div class="col-12 mt-5">
-        <div class="card border-bottom {{explode(' ',$title)[1]=='Edit'?'border-warning':'border-success'}}">
+        <div class="card border-bottom border-primary">
             <div class="card-body">
                 <div class="row">
                     <form class="validate-form"  method="post">
                         @csrf
                         <div class="mb-3">
-                            <label for="" class="form-label">Register Id</label>
-                              <input type="text" class="form-control" disabled value="{{$withdrawal->User?->register_id??'-'}}">
+                            <label for="" class="form-label">Mobile No.</label>
+                              <input type="text" class="form-control" disabled value="{{$withdrawal?->User?->mobile??'-'}}">
+                          </div>
+                           <div class="mb-3">
+                            <label for="" class="form-label">UPI ID</label>
+                              <input type="text" class="form-control" disabled value="{{$withdrawal?->User?->UserDetail?->upi_id??'-'}}">
                           </div>
                           <div class="mb-3">
-                              <label for="" class="form-label">Coins</label>
-                              <input type="text" class="form-control" disabled value="{{$withdrawal->coin_quantity??'-'}}">
+                              <label for="" class="form-label">Amount</label>
+                              <input type="text" class="form-control" disabled value="{{$withdrawal?->amount??'-'}}">
                           </div>
-                          <div class="mb-3">
-                            <label for="" class="form-label">Wallet Address</label>
-                            <input type="text" class="form-control" disabled value="{{$withdrawal->wallet_address??'-'}}">
-                        </div>
+
                         <div class="mb-3">
                             <label for="" class="form-label">Status</label>
-                            <select class="form-select" name="status" required id="status" {{$withdrawal->status!='pending'?'disabled':''}}>
-                                <option value="pending" {{$withdrawal->status=='pending'?'selected':''}}>Pending</option>
+                            <select class="form-select" name="status" required id="status" >
+                                <option value="">Select Status</option>
                                 <option value="success" {{$withdrawal->status=='success'?'selected':''}}>Success</option>
-                                <option value="failed" {{$withdrawal->status=='failed'?'selected':''}}>Failed</option>
+                                <option value="rejected" {{$withdrawal->status=='rejected'?'selected':''}}>Rejected</option>
                             </select>
                             @error('status')
                              <span class="text-danger">{{$message}}</span>
@@ -51,12 +52,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Comment</label>
-                          <textarea class="form-control" name="comment"  placeholder="Comment" rows="2" {{$withdrawal->status!='pending'?'disabled':''}}>{{$withdrawal->comment??''}}</textarea>
+                          <textarea class="form-control" name="comment"  placeholder="Comment" rows="2"></textarea>
                           @error('comment')
                           <span class="text-danger">{{$message}}</span>
                          @enderror
                         </div>
-                          <button class="btn btn-success btn-sm" type="submit" {{$withdrawal->status!='pending'?'disabled':''}}>Submit</button>
+                          <button class="btn btn-success btn-sm" type="submit" >Submit</button>
                       </form>
              </div>
             </div>

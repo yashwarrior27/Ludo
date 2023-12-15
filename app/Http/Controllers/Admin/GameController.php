@@ -152,4 +152,20 @@ class GameController extends Controller
         }
      }
 
+     public function GameDelete(Game $game)
+     {
+        try
+        {
+          if($game->status!='0') return redirect('/games')->with('error','Game is started.');
+
+          $game->delete();
+
+          return redirect('/games')->with('success','Game delete successful.');
+        }
+        catch(\Exception $e)
+        {
+            return $this->ErrorMessage($e);
+        }
+     }
+
 }
