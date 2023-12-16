@@ -269,4 +269,17 @@ class AuthController extends Controller
         }
     }
 
+    public function Logout()
+    {
+        try
+        {
+            if(Auth::check())
+               Auth::logout();
+           return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success);
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
 }

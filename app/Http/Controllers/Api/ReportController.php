@@ -8,6 +8,7 @@ use App\Models\Deposit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Game;
+use App\Models\Withdrawal;
 
 class ReportController extends Controller
 {
@@ -57,8 +58,7 @@ class ReportController extends Controller
 
             $data=$games->map(function($collect)use($user){
 
-                $data=['created_name'=>$collect->CreatedUser->username,
-                'accepted_name'=>$collect->AcceptedUser->username,
+                $data=['vs_name'=>$collect->created_id==$user->id?$collect->AcceptedUser->username:$collect->CreatedUser->username,
                 'game_id'=>$collect->id,
                 'amount'=>$collect->amount,
                 'timestamp'=>$collect->created_at
@@ -179,6 +179,32 @@ class ReportController extends Controller
 
           return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$penality,$data);
 
+        }
+        catch(\Exception $e)
+        {
+            return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+        }
+    }
+
+    public function WithdrawalReport(Request $request)
+    {
+        try
+        {
+            $paginate=isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
+
+            $user=Auth::user();
+
+            $withdrawals=Withdrawal::where('user_id',$user->id)->orderBy('id','Desc')->paginate($paginate);
+
+            $data=$withdrawals->map(function($collect){
+                 return [
+                    'amount'=>$collect->amount,
+                    'transaction_id'=>$collect->transaction_id,
+                    'status'=>$collect->status
+                 ];
+            });
+
+            return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$withdrawals,$data);
         }
         catch(\Exception $e)
         {

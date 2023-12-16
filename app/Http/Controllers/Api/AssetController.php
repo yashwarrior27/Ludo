@@ -22,6 +22,25 @@ class AssetController extends Controller
        }
    }
 
+   public function Settings()
+   {
+    try
+    {
+        $data=[];
+        $settings=Setting::whereIn('key',['telegram','whatsapp'])->get();
+
+        foreach($settings as $key=>$value)
+        {
+            $data[$value->key]=$value->value;
+        }
+
+      return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$data);
+    }
+    catch(\Exception $e)
+    {
+        return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+    }
+   }
 
 
 }

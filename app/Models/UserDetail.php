@@ -9,4 +9,9 @@ class UserDetail extends Model
 {
     use HasFactory;
     protected $guarded=[];
+
+    public function User()
+    {
+        return $this->hasOne(User::class,'id','user_id');
+    }
 }

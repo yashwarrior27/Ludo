@@ -44,5 +44,23 @@
           <div data-i18n="Analytics">Categories</div>
         </a>
       </li>
+       <li class="menu-item  {{ request()->segment(1)=='kycs' ?'active': '' }}">
+        <a href="{{url("/kycs")}}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-file'></i>
+          <div data-i18n="Analytics">KYCs</div>
+        </a>
+      </li>
+      <li class="menu-item  {{ request()->segment(1)=='settings' ?'active': '' }}">
+        <a href="{{url("/settings")}}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-cog'></i>
+          <div data-i18n="Analytics">Settings</div>
+        </a>
+      </li>
+      <li class="menu-item  {{ request()->segment(1)=='users' ?'active': '' }}">
+        <a href="{{url("/users")}}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-user-detail'></i>
+          <div data-i18n="Analytics">Users</div>
+        </a>
+      </li>
     </ul>
   </aside>

@@ -40,6 +40,7 @@
                                 <select name="filter" class="form-select" onchange="document.getElementById('search-form').submit()">
                                     <option value="">Select Status</option>
                                     <option value="complete" {{request()->query('filter')=='complete'?'selected':''}}>Complete</option>
+                                    <option value="review" {{request()->query('filter')=='review'?'selected':''}}>Review</option>
                                     <option value="pending" {{request()->query('filter')=='pending'?'selected':''}}>Pending</option>
                                 </select>
                             </div>
@@ -59,10 +60,10 @@
                 <thead class="">
                   <tr>
                     <th scope="col" class="text-center">Sr No.</th>
-                    <th scope="col" class="text-center">Register ID</th>
-                    <th scope="col" class="text-center">Kyc Name</th>
-                    <th scope="col" class="text-center">PAN Number</th>
-                    <th scope="col" class="text-center">Aadhar Number</th>
+                    <th scope="col" class="text-center">Mobile No.</th>
+                    <th scope="col" class="text-center">Aadhar Front </th>
+                    <th scope="col" class="text-center">Aadhar Back</th>
+                    <th scope="col" class="text-center">UPI ID</th>
                     <th scope="col" class="text-center">Status</th>
                     <th scope="col" class="text-center">Actions</th>
                   </tr>
@@ -72,28 +73,52 @@
                     @foreach ($data as $key => $item)
                     <tr>
                         <th class="text-center">{{$key+1??'-'}}</th>
-                        <td class="text-center">{{$item->User?->register_id??'-'}}</td>
-                        <td class="text-center">{{$item->kyc_name??'-'}}</td>
-                        <td class="text-center">{{$item->pan_number??'-'}}</td>
-                        <td class="text-center">{{$item?->aadhaar_number??'-'}}</td>
+                        <td class="text-center">{{$item->User?->mobile??'-'}}</td>
+                        <td class="text-center">
+                            @if (!empty($item->aadhar_front))
+                            <a href="{{url("/assets/images/aadhar/{$item?->aadhar_front}")}}" class="text-center"><img src="{{url("/assets/images/aadhar/{$item?->aadhar_front}")}}" class="img-fluid w-25" alt=""></a>
+                           @else
+                           -
+                            @endif
+                        </td>
+
+                        <td class="text-center">
+                            @if (!empty($item->aadhar_back))
+                            <a href="{{url("/assets/images/aadhar/{$item?->aadhar_back}")}}" class="text-center"><img src="{{url("/assets/images/aadhar/{$item?->aadhar_back}")}}" class="img-fluid w-25" alt=""></a>
+                           @else
+                           -
+                            @endif</td>
+                            <td class="text-center">{{$item?->upi_id??'-'}}</td>
                            <td class="text-center">
-                               @if ($item?->status=='0')
+                               @if ($item?->status=='pending')
                                 <span class="badge bg-warning">Pending</span>
-                                @elseif ($item?->status=='1')
-                                <span class="badge bg-success">Complete</span>
+                                @elseif ($item?->status=='review')
+                                <span class="badge bg-primary">Review</span>
+                                @else
+                                  <span class="badge bg-success">Success</span>
                                @endif
                            </td>
 
                         <td>
-                           <a href="{{url("/admin/user-kyc-edit/{$item->id}")}}" class="btn btn-sm btn-warning" >Edit</a>
+                                  @if ($item->status!='pending')
+                                  <a href="{{url("/kyc-edit/{$item->id}")}}" class="btn btn-sm {{$item->status=='review'?'btn-warning':'btn-success'}} " >{{$item->status=='review'?'Edit':'View'}}</a>
+                                  @endif
                         </td>
                     </tr>
                     </div>
                     @endforeach
+                    @else
+                    @php
+                        $nodata=1;
+                    @endphp
                 @endif
                 </tbody>
 
             </table>
+
+            @if (isset($nodata))
+               <p class="text-center pt-3"> No Data Found.</p>
+            @endif
     </div>
             <div class="pt-2 px-2 pb-1 mt-4 d-flex justify-content-end">
                 {{$data->withQueryString()->links()}}

@@ -56,10 +56,10 @@ class PaymentController extends Controller
 
           $user=Auth::user();
 
-          $userDetail=UserDetail::where('user_id',$user->id)->first();
+        //   $userDetail=UserDetail::where('user_id',$user->id)->first();
 
-          if($request->amount > 500 && (!$userDetail || $userDetail->status!=='success'))
-                 return \ResponseBuilder::fail($this->messages['NEED_KYC'],$this->badRequest);
+        //   if($request->amount > 500 && (!$userDetail || $userDetail->status!=='success'))
+        //          return \ResponseBuilder::fail($this->messages['NEED_KYC'],$this->badRequest);
 
           if(Deposit::where('user_id',$user->id)->where('status','pending')->first())
              return \ResponseBuilder::fail($this->messages['ALREADY_PENDING'],$this->badRequest);
@@ -102,7 +102,7 @@ class PaymentController extends Controller
 
         $userDetail=UserDetail::where('user_id',$user->id)->first();
 
-        if(!$userDetail || $userDetail->status!='success')
+        if($request->amount >500 && (!$userDetail || $userDetail->status!='success'))
            return \ResponseBuilder::fail($this->messages['NEED_KYC'],$this->badRequest);
 
         if($user->WithdrawalableAmount()<(int)$request->amount)
@@ -130,5 +130,20 @@ class PaymentController extends Controller
     {
         return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
     }
+ }
+
+ public function WithdrawalableAmount()
+ {
+    try
+    {
+        $user=Auth::user();
+        $data=['withdrawalable_amount'=>$user->WithdrawalableAmount()];
+        return \ResponseBuilder::success($this->messages['success'],$this->success,$data);
+    }
+    catch(\Exception $e)
+    {
+        return \ResponseBuilder::fail($this->ErrorMessage($e),$this->serverError);
+    }
+
  }
 }

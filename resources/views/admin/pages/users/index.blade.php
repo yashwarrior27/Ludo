@@ -59,14 +59,12 @@
                 <thead class="">
                   <tr>
                     <th scope="col" class="text-center">Sr No.</th>
-                    <th scope="col" class="text-center">Name</th>
                     <th scope="col" class="text-center">User Name</th>
-                    <th scope="col" class="text-center">Register ID</th>
-                    <th scope="col" class="text-center">Sponsor ID</th>
-                    <th scope="col" class="text-center">Email</th>
-                    <th scope="col" class="text-center">Country Code</th>
-                    <th scope="col" class="text-center">Phone No.</th>
+                    <th scope="col" class="text-center">Mobile No.</th>
+                    <th scope="col" class="text-center">Parent Mobile No.</th>
+                    <th scope="col" class="text-center">KYC Status</th>
                     <th scope="col" class="text-center">Status</th>
+                    <th scope="col" class="text-center">Date</th>
                     <th scope="col" class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -75,26 +73,40 @@
                     @foreach ($data as $key => $item)
                     <tr>
                         <th class="text-center">{{$key+1??'-'}}</th>
-                        <td class="text-center">{{$item?->name??'-'}}</td>
                         <td class="text-center">{{$item?->username??'-'}}</td>
-                        <td class="text-center">{{$item?->register_id??'-'}}</td>
-                        <td class="text-center">{{$item?->Parent?->register_id??'-'}}</td>
-                        <td class="text-center">{{$item?->email??'-'}}</td>
-                        <td class="text-center">{{'+ '.$item?->countrycode?->phonecode." ({$item?->countrycode?->name})"??'-'}}</td>
-                        <td class="text-center">{{$item?->number??'-'}}</td>
+                        <td class="text-center">{{$item?->mobile??'-'}}</td>
+                        <td class="text-center">{{$item?->Parent?->mobile??'-'}}</td>
+
+                         <td class="text-center">
+                            @if ($item?->UserDetail?->status=='pending')
+                                 <span class="badge bg-warning">Pending</span>
+                                 @elseif($item?->UserDetail?->status=='review')
+                                 <span class="badge bg-primary">Review</span>
+                                 @else
+                                 <span class="badge bg-success">Success</span>
+                            @endif
+                         </td>
                         <td class="text-center">{!!$item?->status==1?'<span class="badge bg-success">Active</span>':'<span class="badge bg-danger">De-active</span>'!!}</td>
+                        <td class="text-center">{{date('d-m-Y',strtotime($item?->created_at))}}</td>
                         <td class="text-center"><div class="d-flex">
-                            <a href="{{url("/admin/user-view/{$item->id}")}}" class="btn rounded-pill btn-sm btn-info m-1">View</a>
-                            <a href="{{url("/admin/user-edit/{$item->id}")}}" class="btn rounded-pill btn-sm btn-warning m-1">Edit</a>
+                            <a href="{{url("/user-view/{$item->id}")}}" class="btn rounded-pill btn-sm btn-info m-1">View</a>
+                            <a href="{{url("/user-edit/{$item->id}")}}" class="btn rounded-pill btn-sm btn-warning m-1">Edit</a>
 
                         </div></td>
                       </tr>
                     @endforeach
-                </div>
+                    @else
+                    @php
+                        $nodata=1;
+                    @endphp
                 @endif
                 </tbody>
 
             </table>
+
+            @if (isset($nodata))
+               <p class="text-center pt-3"> No Data Found.</p>
+            @endif
     </div>
             <div class="pt-2 px-2 pb-1 mt-4 d-flex justify-content-end">
                 {{$data->withQueryString()->links()}}

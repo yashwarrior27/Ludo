@@ -67,6 +67,37 @@ class GameController extends Controller
 
             $user=Auth::user();
 
+            $games_current=Game::with('AcceptedUser','CreatedUser')->whereNotIn('status',['4','5'])->where(function($query)use($user){return $query->where('accepted_id',$user->id)->orWhere('created_id',$user->id);})->orderBy('id','Desc')->get();
+
+            $data=[];
+
+            foreach($games_current as $key=>$game)
+            {
+
+            if($game->accepted_id==$user->id)
+            {
+                $data[]=[
+                    'type'=>0,
+                    'own_name'=>$game->AcceptedUser->username,
+                    'amount'=>number_format($game->amount,3),
+                    'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
+                    'game_id'=>$game->id,
+                    'username'=>$game->CreatedUser->username,
+                    'status'=>$game->status];
+            }
+            else
+            {
+                $data[]=[
+                    'type'=>1,
+                    'own_name'=>$game->CreatedUser->username,
+                    'amount'=>number_format($game->amount,3),
+                    'prize'=>number_format($game->amount+($game->amount-($game->amount*$this->feeper/100)),3),
+                    'game_id'=>$game->id,
+                    'username'=>!empty($game->accepted_id)?$game->AcceptedUser->username:null,
+                    'status'=>!empty($game->accepted_id)?$game->status:null];
+            }
+        }
+
             $games=Game::selectRaw("users.username as username,games.amount as amount,games.id as id,CAST((games.amount + (games.amount-(games.amount*{$this->feeper}/100))) AS DECIMAL(20,3)) as prize")->join('users','games.created_id','=','users.id')
                         ->where('games.created_id','!=',$user->id)
                         ->whereNull('games.accepted_id')
@@ -75,7 +106,12 @@ class GameController extends Controller
                         ->orderBy('games.id','Desc')
                         ->get()->toArray();
 
-            return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$games);
+                        $datas=[
+                            'current_battle'=>$data,
+                            'open_battle'=>$games
+                        ];
+
+            return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$datas);
 
         }
         catch(\Exception $e)
@@ -416,7 +452,7 @@ class GameController extends Controller
 
             $game=Game::where('id',$request->game_id)->where('status','1')->first();
 
-            if(preg_match("/^{($game->category_id-1)}\d{7}$/",$request->room_code)!=1)
+            if(($game->category_id==1 && preg_match("/^0\d{7}$/",$request->room_code)!=1)||($game->category_id==2 && preg_match("/^1\d{7}$/",$request->room_code)!=1))
                return \ResponseBuilder::fail('Invalid room code.',$this->badRequest);
 
             if(!$game) return \ResponseBuilder::fail($this->messages['INVALID_GAME'],$this->badRequest);
@@ -501,6 +537,7 @@ class GameController extends Controller
                  GameResult::create([
                       'game_id'=>$game->id,
                       'user_id'=>$user->id,
+                      'comment'=>$request->reason,
                       'status'=>'cancel'
                  ]);
 

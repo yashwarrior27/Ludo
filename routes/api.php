@@ -29,6 +29,7 @@ Route::controller(AuthController::class)->group(function(){
 Route::controller(AssetController::class)->group(function(){
 
 Route::get('/categories','Categories');
+Route::get('/settings','Settings');
 
 });
 
@@ -42,7 +43,7 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::post('/set-kyc-data','KYCUpdate');
         Route::get('/referral-data','GetReferralData');
         Route::get('/wallet-balance','WalletBalance');
-
+        Route::get('/logout','Logout');
     });
 
     Route::controller(GameController::class)->group(function(){
@@ -67,6 +68,7 @@ Route::group(['middleware' => ['auth:api']],function(){
        Route::get('/deposit-data','DepositData');
        Route::post('/make-deposit','MakeDeposit');
        Route::post('/withdrawal-request','Withdrawal');
+       Route::get('/withdrawalable-amount','WithdrawalableAmount');
 
     });
 
@@ -77,6 +79,7 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::get('/deposit-report','DepositReport');
         Route::get('/transaction-report','TransactionReport');
         Route::get('/penalty-report','PenaltyReport');
+        Route::get('/withdrawal-report','WithdrawalReport');
     });
 
 });

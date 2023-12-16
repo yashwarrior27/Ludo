@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepositController;
 use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\IndexController;
+use App\Http\Controllers\Admin\KYCController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WithdrawalController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +67,23 @@ Route::group(['middleware' => ['auth']], function () {
 
     });
 
+    Route::controller(KYCController::class)->group(function(){
+
+        Route::get('/kycs','Index');
+        Route::get('/kyc-edit/{userDetail}','KYCEdit');
+        Route::post('/kyc-edit/{userDetail}','KYCUpdate');
+    });
+
+    Route::controller(SettingController::class)->group(function(){
+
+        Route::get('/settings','Index');
+        Route::post('/settings','Update');
+    });
+
+    Route::controller(UserController::class)->group(function(){
+
+        Route::get('/users','Index');
+    });
 });
 
 Route::get('/clear-cache', function () {
