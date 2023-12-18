@@ -83,6 +83,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::controller(UserController::class)->group(function(){
 
         Route::get('/users','Index');
+        Route::get('/user-edit/{user}','UserEdit');
+        Route::post('/user-edit/{user}','UserUpdate');
+        Route::get('/user-view/{user}','UserView');
     });
 });
 

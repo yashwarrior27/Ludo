@@ -42,20 +42,48 @@ class User extends Authenticatable
         ->where('status',1)
         ->sum('amount');
 
-        // return (float)$totalBalance-(float)$totalWithdrawal;
-        return 500;
+         return (float)$totalBalance-(float)$totalWithdrawal;
+        // return 500;
      }
 
     public function WithdrawalableAmount()
     {
-       $totalBalance=(float) $this->TotalBalance();
-
-      $totalWin=(float) Transaction::where('user_id',$this->id)
+          $totalWin=(float) Transaction::where('user_id',$this->id)
       ->where('trans','3')
       ->where('status',1)
       ->sum('amount');
 
-       return $totalBalance>($totalBalance-$totalWin)?$totalBalance-($totalBalance-$totalWin):0;
+      if($totalWin<=0)
+         return 0;
+
+      $totaldeposit=(float) Transaction::where('user_id',$this->id)
+      ->whereIn('trans',['0','2','4'])
+      ->where('status',1)
+      ->sum('amount');
+
+
+      $totalPenalty=(float) Transaction::where('user_id',$this->id)
+      ->where('trans','5')
+      ->where('status',1)
+      ->sum('amount');
+
+     $totalWithdrawal=(float) Transaction::where('user_id',$this->id)
+      ->where('trans','6')
+      ->where('status',1)
+      ->sum('amount');
+
+      $totalPlay=(float) Transaction::where('user_id',$this->id)
+      ->where('trans','1')
+      ->where('status',1)
+      ->sum('amount');
+
+      if(($totaldeposit-$totalPlay-$totalPenalty)>=0)
+          return $totalWin-$totalWithdrawal;
+       else
+       {
+           $t=($totaldeposit-$totalPlay-$totalPenalty);
+           return $totalWin-$totalWithdrawal-$t;
+       }
     }
 
     public function UserDetail()

@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Transaction;
-
+use Laravel\Passport\Token;
 
 
 class AuthController extends Controller
@@ -103,6 +103,8 @@ class AuthController extends Controller
 
            $user->otp=null;
            $user->save();
+
+           Token::where('user_id', $user->id)->delete();
 
            Auth::login($user);
 
@@ -273,8 +275,9 @@ class AuthController extends Controller
     {
         try
         {
-            if(Auth::check())
-               Auth::logout();
+            $user = Auth::user()->token();
+            $user->revoke();
+
            return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success);
         }
         catch(\Exception $e)

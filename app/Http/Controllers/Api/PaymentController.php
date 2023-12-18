@@ -138,7 +138,7 @@ class PaymentController extends Controller
     {
         $user=Auth::user();
         $data=['withdrawalable_amount'=>$user->WithdrawalableAmount()];
-        return \ResponseBuilder::success($this->messages['success'],$this->success,$data);
+        return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$data);
     }
     catch(\Exception $e)
     {
