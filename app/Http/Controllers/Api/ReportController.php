@@ -200,7 +200,8 @@ class ReportController extends Controller
                  return [
                     'amount'=>$collect->amount,
                     'transaction_id'=>$collect->transaction_id,
-                    'status'=>$collect->status
+                    'status'=>$collect->status,
+                    'timestamp'=>$collect->created_at
                  ];
             });
 

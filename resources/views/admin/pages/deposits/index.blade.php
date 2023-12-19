@@ -86,7 +86,9 @@
                         <td class="text-center">{{date('d-m-Y',strtotime($item->created_at)??'-')}}</td>
                         <td class="text-center w-25">
                             @if ($item->status=='pending')
+                            @if (Auth::user()->id!=3)
                             <a href="{{url("/deposit-edit",$item->id)}}" class="btn btn-sm btn-primary">Edit</a>
+                            @endif
                              @else
                              <a href="{{url("/assets/images/deposits/{$item?->image}")}}" download ><img src="{{url("/assets/images/deposits/{$item?->image}")}}" class="img-fluid w-50" ></a>
                             @endif

@@ -92,7 +92,9 @@
                         <td class="text-center">{{$item?->comment??'-'}}</td>
                           <td class="text-center">{{date('d-m-Y',strtotime($item?->created_at))??'-'}}</td>
                         <td>
-                           <a href="{{url("/withdrawal-edit/{$item->id}")}}" class="btn btn-sm btn-warning" style="{{$item?->status!='pending'?'pointer-events:none;opacity:.6;':''}}" >Edit</a>
+                            @if (Auth::user()->id!=3)
+                            <a href="{{url("/withdrawal-edit/{$item->id}")}}" class="btn btn-sm btn-warning" style="{{$item?->status!='pending'?'pointer-events:none;opacity:.6;':''}}" >Edit</a>
+                            @endif
                         </td>
                     </tr>
                     </div>

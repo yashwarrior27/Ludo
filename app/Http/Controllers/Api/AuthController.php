@@ -132,7 +132,7 @@ class AuthController extends Controller
             $totalBattle=Game::where(function($query)use($user){
                return $query->where('created_id',$user->id)->orWhere('accepted_id',$user->id);
             })
-            ->where('status',4)
+            ->where('status','4')
             ->count();
 
             $data=['number'=>$user->mobile,

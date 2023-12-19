@@ -39,8 +39,8 @@
                             <div class="col-4">
                                 <select name="filter" class="form-select" onchange="document.getElementById('search-form').submit()">
                                     <option value="">Select Status</option>
-                                    <option value="active" {{request()->query('filter')=='active'?'selected':''}}>Active</option>
-                                    <option value="de-active" {{request()->query('filter')=='de-active'?'selected':''}}>De-active</option>
+                                    <option value="1" {{request()->query('filter')=='active'?'selected':''}}>Active</option>
+                                    <option value="0" {{request()->query('filter')=='de-active'?'selected':''}}>De-active</option>
                                 </select>
                             </div>
                                <div class="col-5 p-0">

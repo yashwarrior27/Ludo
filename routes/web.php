@@ -36,35 +36,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::controller(DashboardController::class)->group(function(){
 
         Route::get('/dashboard','Index');
+        Route::post('/dashboard','RoleUpdate')->middleware('superadmin');
     });
 
-    Route::controller(DepositController::class)->group(function(){
 
-        Route::get('/deposits','Index');
-        Route::get('/deposit-edit/{deposit}','EditDeposit');
-        Route::post('/deposit-edit/{deposit}','UpdateDeposit');
-    });
+ Route::middleware(['admin'])->group(function () {
+
 
     Route::controller(GameController::class)->group(function(){
         Route::get('/games','Index');
         Route::get('/game-detail/{game}','GameDetail');
         Route::post('/game-detail/{game}','GameDetailUpdate');
         Route::get('/game-delete/{game}','GameDelete');
-    });
-
-    Route::controller(WithdrawalController::class)->group(function(){
-       Route::get('/withdrawals','Index');
-       Route::get('/withdrawal-edit/{withdrawal}','WithdrawalEdit');
-       Route::post('/withdrawal-edit/{withdrawal}','WithdrawalUpdate');
-    });
-
-    Route::controller(CategoryController::class)->group(function(){
-
-        Route::get('/categories','Index');
-        Route::get('/category-create','CategoryCreate');
-        Route::post('/category-create','CategoryStore');
-        Route::get('/category-edit/{category}','CategoryEdit');
-
     });
 
     Route::controller(KYCController::class)->group(function(){
@@ -87,6 +70,40 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/user-edit/{user}','UserUpdate');
         Route::get('/user-view/{user}','UserView');
     });
+
+});
+
+
+Route::middleware(['superadmin'])->group(function () {
+
+    Route::controller(CategoryController::class)->group(function(){
+
+        Route::get('/categories','Index');
+        Route::get('/category-create','CategoryCreate');
+        Route::post('/category-create','CategoryStore');
+        Route::get('/category-edit/{category}','CategoryEdit');
+
+    });
+});
+
+Route::middleware(['supervisorD'])->group(function () {
+    Route::controller(DepositController::class)->group(function(){
+
+        Route::get('/deposits','Index');
+        Route::get('/deposit-edit/{deposit}','EditDeposit')->middleware('manager');
+        Route::post('/deposit-edit/{deposit}','UpdateDeposit')->middleware('manager');
+    });
+});
+
+Route::middleware(['supervisorW'])->group(function () {
+
+    Route::controller(WithdrawalController::class)->group(function(){
+        Route::get('/withdrawals','Index');
+        Route::get('/withdrawal-edit/{withdrawal}','WithdrawalEdit')->middleware('manager');
+        Route::post('/withdrawal-edit/{withdrawal}','WithdrawalUpdate')->middleware('manager');
+     });
+});
+
 });
 
 Route::get('/clear-cache', function () {

@@ -132,7 +132,9 @@
                         <td class="text-center">{{date('d-m-Y',strtotime($item->created_at)??'-')}}</td>
                         <td class="text-center w-25">
                             @if ($item->status=='pending')
+                            @if (Auth::user()->id!=3)
                             <a href="{{url("/deposit-edit",$item->id)}}" class="btn btn-sm btn-primary">Edit</a>
+                            @endif
                              @else
                              <a href="{{url("/assets/images/deposits/{$item?->image}")}}" download ><img src="{{url("/assets/images/deposits/{$item?->image}")}}" class="img-fluid w-50" ></a>
                             @endif
@@ -233,7 +235,9 @@
                         <td class="text-center">{{$item?->comment??'-'}}</td>
                           <td class="text-center">{{date('d-m-Y',strtotime($item?->created_at))??'-'}}</td>
                         <td>
-                           <a href="{{url("/withdrawal-edit/{$item->id}")}}" class="btn btn-sm btn-warning" style="{{$item?->status!='pending'?'pointer-events:none;opacity:.6;':''}}" >Edit</a>
+                            @if (Auth::user()->id!=3)
+                            <a href="{{url("/withdrawal-edit/{$item->id}")}}" class="btn btn-sm btn-warning" style="{{$item?->status!='pending'?'pointer-events:none;opacity:.6;':''}}" >Edit</a>
+                            @endif
                         </td>
                     </tr>
                     @endforeach

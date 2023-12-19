@@ -11,37 +11,51 @@
 
     <div class="menu-inner-shadow " style="margin-top: 50px"></div>
 
+    @php
+        $user=Auth::user();
+    @endphp
     <ul class="menu-inner py-1 mt-2 ">
       <!-- Dashboard -->
-
       <li class="menu-item  {{ request()->segment(1)=='dashboard' ?'active': '' }}">
         <a href="{{url("/dashboard")}}" class="menu-link">
           <i class="menu-icon tf-icons bx bxs-home-circle"></i>
           <div data-i18n="Analytics">Dashboard</div>
         </a>
       </li>
+      @if (($user->id>=1 && $user->id<=4) || $user->id==6)
+
       <li class="menu-item  {{ request()->segment(1)=='deposits' ?'active': '' }}">
         <a href="{{url("/deposits")}}" class="menu-link">
             <i class='menu-icon tf-icons bx bxs-bank' ></i>
           <div data-i18n="Analytics">Deposits</div>
         </a>
       </li>
-      <li class="menu-item  {{ request()->segment(1)=='games' ?'active': '' }}">
-        <a href="{{url("/games")}}" class="menu-link">
-            <i class='menu-icon tf-icons bx bxs-dice-6' ></i>
-          <div data-i18n="Analytics">Games</div>
-        </a>
-      </li>
+      @endif
+
+      @if (($user->id>=1 && $user->id<=3) || $user->id==5 || $user->id==6)
       <li class="menu-item  {{ request()->segment(1)=='withdrawals' ?'active': '' }}">
         <a href="{{url("/withdrawals")}}" class="menu-link">
             <i class='menu-icon tf-icons bx bx-transfer'></i>
           <div data-i18n="Analytics">Withdrawals</div>
         </a>
       </li>
+      @endif
+
+      @if ($user->id==1 || $user->id==6)
       <li class="menu-item  {{ request()->segment(1)=='categories' ?'active': '' }}">
         <a href="{{url("/categories")}}" class="menu-link">
             <i class='menu-icon tf-icons bx bxs-category-alt'></i>
           <div data-i18n="Analytics">Categories</div>
+        </a>
+      </li>
+      @endif
+
+      @if (($user->id>=1 && $user->id<=3)|| $user->id==6)
+
+      <li class="menu-item  {{ request()->segment(1)=='games' ?'active': '' }}">
+        <a href="{{url("/games")}}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-dice-6' ></i>
+          <div data-i18n="Analytics">Games</div>
         </a>
       </li>
        <li class="menu-item  {{ request()->segment(1)=='kycs' ?'active': '' }}">
@@ -62,5 +76,6 @@
           <div data-i18n="Analytics">Users</div>
         </a>
       </li>
+      @endif
     </ul>
   </aside>

@@ -33,7 +33,7 @@ Route::get('/settings','Settings');
 
 });
 
-Route::group(['middleware' => ['auth:api']],function(){
+Route::group(['middleware' => ['auth:api','checkstatus']],function(){
 
     Route::controller(AuthController::class)->group(function(){
 
