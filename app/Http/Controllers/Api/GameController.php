@@ -316,6 +316,7 @@ class GameController extends Controller
                 'type_id'=>$game->id,
                 'type'=>'Play_Game',
             ]]);
+            
 
             $game->status='1';
             $game->room_code_timer=time()+300;
@@ -604,7 +605,38 @@ class GameController extends Controller
                                     'type_id'=>$game->id,
                                     'type'=>'Referral_Bonus'
                                     ]);
+                                    
+                                     $parent=User::where('id',$gUser->parent_id)->first();
+                                     $parent->deposit_wallet+=($game->amount*($this->referral/100));
+                                     $parent->save();
                             }
+                          $lUser=User::where('id',$gameresult->user_id==$game->created_id?$game->accepted_id:$game->created_id)->first();
+                          
+                          if($gUser->deposit_wallet>=$game->amount)
+                          { 
+                              $gUser->deposit_wallet-=$game->amount;
+                              $amt1=$game->amount+($game->amount-($game->amount*$this->feeper/100));
+                          }
+                          else
+                          {
+                              $amt1=($game->amount+($game->amount-($game->amount*$this->feeper/100)))-($game->amount-$gUser->deposit_wallet);
+                              $gUser->deposit_wallet=0;
+                          }
+                          $gUser->winning_wallet+=$amt1;
+                          $gUser->save();
+                          
+                          if($lUser->deposit_wallet>=$game->amount)
+                          {
+                              $lUser->deposit_wallet-=$game->amount;
+                              $lUser->save();
+                          }
+                          else
+                          {
+                              $lUser->winning_wallet-=($game->amount-$lUser->deposit_wallet);
+                              $lUser->deposit_wallet=0;
+                              $lUser->save();
+                          }
+                          
                         }
                     }
                  }
@@ -652,7 +684,38 @@ class GameController extends Controller
                                     'type_id'=>$game->id,
                                     'type'=>'Referral_Bonus'
                                     ]);
+                                    
+                                  $parent=User::where('id',$user->parent_id)->first();
+                                  $parent->deposit_wallet+=($game->amount*($this->referral/100));
+                                  $parent->save();    
                             }
+                            
+                             $lUser=User::where('id',$user->id==$game->created_id?$game->accepted_id:$game->created_id)->first();
+                          
+                          if($user->deposit_wallet>=$game->amount)
+                          { 
+                              $user->deposit_wallet-=$game->amount;
+                              $amt1=$game->amount+($game->amount-($game->amount*$this->feeper/100));
+                          }
+                          else
+                          {
+                              $amt1=($game->amount+($game->amount-($game->amount*$this->feeper/100)))-($game->amount-$user->deposit_wallet);
+                              $user->deposit_wallet=0;
+                          }
+                          $user->winning_wallet+=$amt1;
+                          $user->save();
+                          
+                          if($lUser->deposit_wallet>=$game->amount)
+                          {
+                              $lUser->deposit_wallet-=$game->amount;
+                              $lUser->save();
+                          }
+                          else
+                          {
+                              $lUser->winning_wallet-=($game->amount-$lUser->deposit_wallet);
+                              $lUser->deposit_wallet=0;
+                              $lUser->save();
+                          }
                            }
 
                        }

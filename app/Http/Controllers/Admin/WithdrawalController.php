@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Game;
 use App\Models\Transaction;
 use App\Models\Withdrawal;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class WithdrawalController extends Controller
@@ -18,7 +19,7 @@ class WithdrawalController extends Controller
 
         $paginate= isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
 
-        $query=Withdrawal::with('User','User.UserDetail');
+        $query=Withdrawal::with('User');
 
         if(isset($request->filter))
         {
@@ -30,9 +31,7 @@ class WithdrawalController extends Controller
             $query->where(function($query)use($request){
                 $query->whereHas('User',function($q)use($request){
                     $q->where('mobile','like',"%{$request->search}%");
-              })->orWhereHas('User.UserDetail',function($q)use($request){
-                $q->where('upi_id','like',"%{$request->search}%");
-              })->orWhere('amount','like',"%{$request->search}%")->orWhere('transaction_id','like',"%{$request->search}%")->orWhere('created_at','like',"%{$request->search}%")->orWhere('comment','like',"%{$request->search}%");
+              })->orWhere('amount','like',"%{$request->search}%")->orWhere('upi_id','like',"%{$request->search}%")->orWhere('transaction_id','like',"%{$request->search}%")->orWhere('created_at','like',"%{$request->search}%")->orWhere('comment','like',"%{$request->search}%");
             });
 
         }
@@ -79,6 +78,12 @@ class WithdrawalController extends Controller
 
         if($request->status=='rejected')
            Transaction::where('user_id',$withdrawal->user_id)->where('trans',6)->where('type_id',$withdrawal->id)->update(['status'=>0]);
+           else
+           {
+               $user=User::findOrFail($withdrawal->user_id);
+               $user->winning_wallet-=$withdrawal->amount;
+               $user->save();
+           }
 
 
       return redirect('/withdrawals')->with('success','Update successful.') ;

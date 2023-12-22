@@ -62,6 +62,7 @@
                     <th scope="col" class="text-center">User Name</th>
                     <th scope="col" class="text-center">Mobile No.</th>
                     <th scope="col" class="text-center">Parent Mobile No.</th>
+                    <th scope="col" class="text-center">Wallet Balance</th>
                     <th scope="col" class="text-center">KYC Status</th>
                     <th scope="col" class="text-center">Status</th>
                     <th scope="col" class="text-center">Date</th>
@@ -76,6 +77,7 @@
                         <td class="text-center">{{$item?->username??'-'}}</td>
                         <td class="text-center">{{$item?->mobile??'-'}}</td>
                         <td class="text-center">{{$item?->Parent?->mobile??'-'}}</td>
+                        <td class="text-center">{{$item?->TotalBalance()??'-'}}</td>
 
                          <td class="text-center">
                             @if ($item?->UserDetail?->status=='pending')

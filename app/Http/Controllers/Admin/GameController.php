@@ -124,7 +124,39 @@ class GameController extends Controller
                             'type_id'=>$game->id,
                             'type'=>'Referral_Bonus'
                             ];
+                            
+                    $parent=User::where('id',$gUser->parent_id)->first();
+                    $parent->deposit_wallet+=($game->amount*($this->referral/100));
+                    $parent->save();
+                            
                     }
+                    
+                       $lUser=User::where('id',$gUser->id==$game->created_id?$game->accepted_id:$game->created_id)->first();
+                          
+                          if($gUser->deposit_wallet>=$game->amount)
+                          { 
+                              $gUser->deposit_wallet-=$game->amount;
+                              $amt1=$game->amount+($game->amount-($game->amount*$this->feeper/100));
+                          }
+                          else
+                          {
+                              $amt1=($game->amount+($game->amount-($game->amount*$this->feeper/100)))-($game->amount-$gUser->deposit_wallet);
+                              $gUser->deposit_wallet=0;
+                          }
+                          $gUser->winning_wallet+=$amt1;
+                          $gUser->save();
+                          
+                          if($lUser->deposit_wallet>=$game->amount)
+                          {
+                              $lUser->deposit_wallet-=$game->amount;
+                              $lUser->save();
+                          }
+                          else
+                          {
+                              $lUser->winning_wallet-=($game->amount-$lUser->deposit_wallet);
+                              $lUser->deposit_wallet=0;
+                              $lUser->save();
+                          }
             }
 
             if(isset($request->penalty_user_id) && !empty($request->penalty_user_id))
@@ -136,6 +168,32 @@ class GameController extends Controller
                       'type_id'=>$game->id,
                       'type'=>isset($request->penalty_reason) && !empty($request->penalty_reason)?$request->penalty_reason:'Game_Penalty'
                 ];
+                
+                $pUser=User::where('id',$request->penalty_user_id)->first();
+                
+                if($pUser->deposit_wallet>=$request->penalty_amount)
+                {
+                $pUser->deposit_wallet-=$request->penalty_amount;
+                $pUser->save();
+                }
+                else
+                {
+                    $amount=$request->penalty_amount-$pUser->deposit_wallet;
+                     $damt=0;
+                     
+                    if($pUser->winning_wallet>=$amount)
+                    {
+                        $pUser->winning_wallet-=$amount;
+                    }
+                    else
+                    {
+                        $damt=$amount-$pUser->winning_wallet;
+                        $pUser->winning_wallet=0;
+                    }
+                    
+                    $pUser->deposit_wallet=0-$damt;
+                    $pUser->save();
+                }
             }
 
             Transaction::insert($trans);

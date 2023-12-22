@@ -53,7 +53,7 @@ class Controller extends BaseController
         'NO_DATA'=>'No data found',
         'ALREADY_PENDING'=>'Already have pending request',
         'NEED_KYC'=>'Please complete your kyc first',
-        'WITHDRAWAL'=>'Added withdrawal request'
+        'WITHDRAWAL'=>'Added withdrawal request',
 
     ];
 

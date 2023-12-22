@@ -31,7 +31,7 @@ Route::get('/logout','Logout');
 
 });
 
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth','logincheck']], function () {
 
     Route::controller(DashboardController::class)->group(function(){
 

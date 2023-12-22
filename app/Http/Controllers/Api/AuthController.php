@@ -179,8 +179,8 @@ class AuthController extends Controller
             $validator=Validator::make($request->all(),[
                       'aadhar_front'=>'required|image|max:5000',
                       'aadhar_back'=>'required|image|max:5000',
-                      'upi_id'=>'required|regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,3}$/',
-            ],['upi_id.regex'=>'Invalid UPI ID.']);
+            ]);
+                    //   'upi_id'=>'required|regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,3}$/', ,['upi_id.regex'=>'Invalid UPI ID.']
 
             if($validator->fails())return \ResponseBuilder::fail($validator->errors()->first(),$this->badRequest);
 
@@ -199,9 +199,9 @@ class AuthController extends Controller
 
             $userdetail->aadhar_front=$aadhar_front;
             $userdetail->aadhar_back=$aadhar_back;
-            $userdetail->upi_id=$request->upi_id;
             $userdetail->status='review';
             $userdetail->save();
+            // $userdetail->upi_id=$request->upi_id;
 
         return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success);
         }
@@ -222,9 +222,10 @@ class AuthController extends Controller
             $data=[
                 'aadhar_front'=>!empty($userdetail->aadhar_front)?url("/assets/images/aadhar/{$userdetail->aadhar_front}"):null,
                 'aadhar_back'=>!empty($userdetail->aadhar_back)?url("/assets/images/aadhar/{$userdetail->aadhar_back}"):null,
-                'upi_id'=>$userdetail->upi_id,
                 'status'=>$userdetail->status
             ];
+                // 'upi_id'=>$userdetail->upi_id,
+                
             return \ResponseBuilder::success($this->messages['SUCCESS'],$this->success,$data);
 
         }

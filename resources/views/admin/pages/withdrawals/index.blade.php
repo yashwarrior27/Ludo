@@ -77,7 +77,7 @@
                     <tr>
                         <th class="text-center">{{$key+1??'-'}}</th>
                         <td class="text-center">{{$item?->User?->mobile??'-'}}</td>
-                        <td class="text-center">{{$item?->User?->UserDetail?->upi_id??'-'}}</td>
+                        <td class="text-center">{{$item?->upi_id??'-'}}</td>
                         <td class="text-center">{{$item?->amount??'-'}}</td>
                         <td class="text-center">
                             @if ($item?->status=='pending')

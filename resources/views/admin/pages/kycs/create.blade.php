@@ -36,11 +36,7 @@
                      </div>
                     <div class="row justify-content-center mt-4">
 
-                        <div class="col-4 text-center">
-                            <label class="form-label d-block">UPI ID</label>
-                            <input type="text" class="form-control" value="{{$userDetail->upi_id??'-'}}" disabled>
-                        </div>
-
+                   
                         <div class="col-4 text-center">
                             <label class="form-label d-block">Aadhar Card Front Image</label>
                             <a href="{{url("/assets/images/aadhar/{$userDetail?->aadhar_front}")}}" download><img src="{{url("/assets/images/aadhar/{$userDetail?->aadhar_front}")}}" class="rounded img-fluid w-40" alt=""></a>

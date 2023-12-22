@@ -5,7 +5,7 @@
     $user=Auth::user();
 @endphp
     <div class="row justify-content-center">
-      <div class="col-lg-10 mb-5 order-0">
+      <div class="col-lg-6 mb-5 order-0">
         <div class="card">
           <div class="d-flex align-items-end row">
             <div class="col-sm-7">
@@ -33,6 +33,12 @@
       </div>
 
       @if ($user->id==1||$user->id==2|| $user->id==6)
+       <div class="col-lg-3 mb-4 ">
+                  <div class="card p-3 text-center">
+                     <h4>Total Earn</h4>
+                     <h4 class="text-primary">{{number_format($data['total_earn'],2)??'0'}}</h4>
+                    </div>
+      </div>
       <div class="col-lg-3 mb-4 ">
                   <div class="card p-3 text-center">
                      <h4>Total Deposits</h4>
@@ -51,6 +57,13 @@
            <h4 class="text-primary">{{number_format($data['total_win'],2)??'0'}}</h4>
           </div>
        </div>
+          <div class="col-lg-3 mb-4 ">
+        <div class="card p-3 text-center">
+           <h4>Total Referral Amount</h4>
+           <h4 class="text-primary">{{number_format($data['total_referral'],2)??'0'}}</h4>
+          </div>
+       </div>
+       
        <div class="col-lg-3 mb-4 ">
         <div class="card p-3 text-center">
            <h4>Total Users</h4>
@@ -83,7 +96,7 @@
        </div>
       @endif
       @if ($user->id==1 || $user->id==6)
-      <div class="col-8 mt-3 card p-4">
+      <div class="col-9 mt-3 card p-4">
         <form  class="validate-form" method="POST">
 
             @csrf

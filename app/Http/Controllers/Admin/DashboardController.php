@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Deposit;
 use App\Models\Game;
 use App\Models\User;
+use App\Models\Transaction;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -27,8 +28,12 @@ class DashboardController extends Controller
             $data['today_withdrawal']=Withdrawal::where('status','success')->whereDate('created_at',date('Y-m-d'))->sum('amount');
             $data['today_win']=Game::where('status','4')->whereDate('created_at',date('Y-m-d'))->sum('winner_amount');
             $data['today_user']=User::whereDate('created_at',date('Y-m-d'))->count();
-
-
+            $data['total_referral']=Transaction::where('trans',4)->where('status',1)->sum('amount');
+            
+            $totalgameamount=Game::where('status','4')->sum('amount');
+             
+            $data['total_earn']=($totalgameamount*2)-$data['total_win']-$data['total_referral'];
+        
            return view('admin.pages.dashboard.index',compact('data'));
         }
         catch(\Exception $e)

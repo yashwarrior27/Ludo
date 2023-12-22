@@ -16,7 +16,7 @@
  <div class="card border-bottom border-info">
     <div class="card-body p-0 p-3">
         <div class="row">
-            <div class="col-10">
+            <div class="col-5">
                 <h3 class="m-0 d-inline-block mx-2">User View</h3>
                 @if ($user->status=='1')
                 <span class="badge bg-success">Active</span>
@@ -25,7 +25,9 @@
                 <span class="badge bg-danger">De-Active</span>
                @endif
             </div>
-
+            <div class="col-5" style="align-self: center;">
+                Wallet Balance :- <span class='bg-light text-dark'>{{$user->TotalBalance()}}</span> 
+            </div>    
             <div class="col-2" style="align-self: center;">
                 <a href="{{url("/user-edit/{$user?->id}")}}" class="btn btn-warning py-1 px-3">Edit</a>
             </div>
@@ -220,7 +222,7 @@
                     <tr>
                         <th class="text-center">{{$key+1??'-'}}</th>
                         <td class="text-center">{{$item?->User?->mobile??'-'}}</td>
-                        <td class="text-center">{{$item?->User?->UserDetail?->upi_id??'-'}}</td>
+                        <td class="text-center">{{$item?->upi_id??'-'}}</td>
                         <td class="text-center">{{$item?->amount??'-'}}</td>
                         <td class="text-center">
                             @if ($item?->status=='pending')

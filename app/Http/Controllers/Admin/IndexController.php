@@ -7,6 +7,7 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class IndexController extends Controller
 {
@@ -33,8 +34,12 @@ class IndexController extends Controller
             if(!Hash::check($request->password,$user->password))
                return redirect()->back()->with('error','Invalid credentials');
 
-            Auth::login($user);
-
+             Auth::login($user);
+             $logincheck=md5(time());
+             Session::put('logincheck',$logincheck);
+             $user->session_token=$logincheck;
+             $user->save();
+             
            return redirect('/dashboard')->with('success','Login successful');
 
         }

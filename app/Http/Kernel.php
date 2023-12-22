@@ -70,6 +70,7 @@ class Kernel extends HttpKernel
         'admin'=>\App\Http\Middleware\Admin::class,
         'manager'=>\App\Http\Middleware\Manager::class,
         'supervisorD'=>\App\Http\Middleware\SupervisorD::class,
-        'supervisorW'=>\App\Http\Middleware\SupervisorW::class
+        'supervisorW'=>\App\Http\Middleware\SupervisorW::class,
+        'logincheck'=>\App\Http\Middleware\LoginCheck::class
     ];
 }

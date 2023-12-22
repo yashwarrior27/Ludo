@@ -63,7 +63,7 @@
                     <th scope="col" class="text-center">Mobile No.</th>
                     <th scope="col" class="text-center">Aadhar Front </th>
                     <th scope="col" class="text-center">Aadhar Back</th>
-                    <th scope="col" class="text-center">UPI ID</th>
+                 
                     <th scope="col" class="text-center">Status</th>
                     <th scope="col" class="text-center">Actions</th>
                   </tr>
@@ -88,7 +88,7 @@
                            @else
                            -
                             @endif</td>
-                            <td class="text-center">{{$item?->upi_id??'-'}}</td>
+                           
                            <td class="text-center">
                                @if ($item?->status=='pending')
                                 <span class="badge bg-warning">Pending</span>

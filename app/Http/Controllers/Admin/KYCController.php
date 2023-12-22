@@ -28,7 +28,7 @@ class KYCController extends Controller
             $query->where(function($query)use($request){
                 $query->whereHas('User',function($q)use($request){
                     $q->where('mobile','like',"%{$request->search}%");
-              })->where('upi_id','like',"%{$request->search}%");
+              });
             });
 
         }
@@ -81,7 +81,6 @@ class KYCController extends Controller
 
                $userDetail->aadhar_front=null;
                $userDetail->aadhar_back=null;
-               $userDetail->upi_id=null;
                $userDetail->status='pending';
                $userDetail->save();
         }

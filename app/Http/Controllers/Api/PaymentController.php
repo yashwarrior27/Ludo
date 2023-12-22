@@ -89,7 +89,8 @@ class PaymentController extends Controller
     {
 
          $validator=Validator::make($request->all(),[
-                 'amount'=>'required|integer|min:95'
+                 'amount'=>'required|integer|min:95',
+                 'upi_id'=>'required'
             ]);
 
         if($validator->fails())
@@ -110,10 +111,17 @@ class PaymentController extends Controller
 
         if(Withdrawal::where('user_id',$user->id)->where('status','pending')->first())
            return \ResponseBuilder::fail($this->messages['ALREADY_PENDING'],$this->badRequest);
+           
+        $lastwithdrawal=Withdrawal::where('user_id',$user->id)->where('status','success')->orderBy('id','Desc')->first();
+        
+        if($lastwithdrawal && (strtotime($lastwithdrawal->created_at)+7200) >= time())
+           return \ResponseBuilder::fail('Please make request after sometime',$this->badRequest);
+           
 
           $withdrawal= Withdrawal::create([
                'user_id'=>$user->id,
                'amount'=>$request->amount,
+               'upi_id'=>$request->upi_id
            ]);
 
            Transaction::create([

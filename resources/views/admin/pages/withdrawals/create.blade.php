@@ -24,7 +24,7 @@
                           </div>
                            <div class="mb-3">
                             <label for="" class="form-label">UPI ID</label>
-                              <input type="text" class="form-control" disabled value="{{$withdrawal?->User?->UserDetail?->upi_id??'-'}}">
+                              <input type="text" class="form-control" disabled value="{{$withdrawal?->upi_id??'-'}}">
                           </div>
                           <div class="mb-3">
                               <label for="" class="form-label">Amount</label>

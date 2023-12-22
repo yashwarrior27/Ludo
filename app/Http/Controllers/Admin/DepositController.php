@@ -7,6 +7,7 @@ use App\Models\Deposit;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class DepositController extends Controller
 {
@@ -99,6 +100,11 @@ class DepositController extends Controller
                ];
 
                Transaction::insert($data);
+              
+               $user=User::findOrFail($deposit->user_id);
+               
+               $user->deposit_wallet+=$request->amount;
+               $user->save();
            }
            else
            {
