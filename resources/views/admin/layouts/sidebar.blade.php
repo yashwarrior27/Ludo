@@ -76,6 +76,12 @@
           <div data-i18n="Analytics">Users</div>
         </a>
       </li>
+      <li class="menu-item  {{ request()->segment(1)=='fake-game' ?'active': '' }}">
+        <a href="{{url("/fake-game")}}" class="menu-link">
+            <i class='menu-icon tf-icons bx bxs-game'></i>
+          <div data-i18n="Analytics">Fake Games</div>
+        </a>
+      </li>
       @endif
     </ul>
   </aside>

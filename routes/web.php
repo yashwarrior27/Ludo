@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepositController;
+use App\Http\Controllers\Admin\FakeGameController;
 use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\IndexController;
 use App\Http\Controllers\Admin\KYCController;
@@ -69,6 +70,12 @@ Route::group(['middleware' => ['auth','logincheck']], function () {
         Route::get('/user-edit/{user}','UserEdit');
         Route::post('/user-edit/{user}','UserUpdate');
         Route::get('/user-view/{user}','UserView');
+    });
+
+    Route::controller(FakeGameController::class)->group(function(){
+
+        Route::get('/fake-game','Index');
+
     });
 
 });
