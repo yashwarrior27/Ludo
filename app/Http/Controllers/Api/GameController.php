@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\FakeGame;
 use App\Models\Game;
 use App\Models\Transaction;
 use App\Models\User;
@@ -316,7 +317,7 @@ class GameController extends Controller
                 'type_id'=>$game->id,
                 'type'=>'Play_Game',
             ]]);
-            
+
 
             $game->status='1';
             $game->room_code_timer=time()+300;
@@ -605,15 +606,15 @@ class GameController extends Controller
                                     'type_id'=>$game->id,
                                     'type'=>'Referral_Bonus'
                                     ]);
-                                    
+
                                      $parent=User::where('id',$gUser->parent_id)->first();
                                      $parent->deposit_wallet+=($game->amount*($this->referral/100));
                                      $parent->save();
                             }
                           $lUser=User::where('id',$gameresult->user_id==$game->created_id?$game->accepted_id:$game->created_id)->first();
-                          
+
                           if($gUser->deposit_wallet>=$game->amount)
-                          { 
+                          {
                               $gUser->deposit_wallet-=$game->amount;
                               $amt1=$game->amount+($game->amount-($game->amount*$this->feeper/100));
                           }
@@ -624,7 +625,7 @@ class GameController extends Controller
                           }
                           $gUser->winning_wallet+=$amt1;
                           $gUser->save();
-                          
+
                           if($lUser->deposit_wallet>=$game->amount)
                           {
                               $lUser->deposit_wallet-=$game->amount;
@@ -636,7 +637,7 @@ class GameController extends Controller
                               $lUser->deposit_wallet=0;
                               $lUser->save();
                           }
-                          
+
                         }
                     }
                  }
@@ -684,16 +685,16 @@ class GameController extends Controller
                                     'type_id'=>$game->id,
                                     'type'=>'Referral_Bonus'
                                     ]);
-                                    
+
                                   $parent=User::where('id',$user->parent_id)->first();
                                   $parent->deposit_wallet+=($game->amount*($this->referral/100));
-                                  $parent->save();    
+                                  $parent->save();
                             }
-                            
+
                              $lUser=User::where('id',$user->id==$game->created_id?$game->accepted_id:$game->created_id)->first();
-                          
+
                           if($user->deposit_wallet>=$game->amount)
-                          { 
+                          {
                               $user->deposit_wallet-=$game->amount;
                               $amt1=$game->amount+($game->amount-($game->amount*$this->feeper/100));
                           }
@@ -704,7 +705,7 @@ class GameController extends Controller
                           }
                           $user->winning_wallet+=$amt1;
                           $user->save();
-                          
+
                           if($lUser->deposit_wallet>=$game->amount)
                           {
                               $lUser->deposit_wallet-=$game->amount;
@@ -746,11 +747,15 @@ class GameController extends Controller
 
               $paginate=isset($request->paginate) && !empty($request->paginate)?$request->paginate:10;
 
-              $game=Game::selectRaw("cuser.username as created_user,auser.username as accepted_user,games.amount as amount,CAST((games.amount + (games.amount-(games.amount*{$this->feeper}/100))) AS DECIMAL(20,3)) as prize")->join(DB::raw('users as cuser'),'games.created_id','cuser.id')->join(DB::raw('users as auser'),'games.accepted_id','auser.id')->whereIn('games.status',['1','2','3'])->orderBy('games.id','Desc')->paginate($paginate);
+              $game=Game::selectRaw("cuser.username as created_user,auser.username as accepted_user,games.amount as amount,CAST((games.amount + (games.amount-(games.amount*{$this->feeper}/100))) AS DECIMAL(20,3)) as prize")->join(DB::raw('users as cuser'),'games.created_id','cuser.id')->join(DB::raw('users as auser'),'games.accepted_id','auser.id')->whereIn('games.status',['1','2','3']);
 
-            $data=$game->toArray()['data'];
+              $fakeGame=FakeGame::selectRaw("created_user,accepted_user,amount,CAST((amount + (amount-(amount*{$this->feeper}/100))) AS DECIMAL(20,3)) as prize");
 
-            return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$game,$data);
+              $results=$game->unionAll($fakeGame)->orderBy('amount','Desc')->paginate($paginate);
+            $data=$results->toArray()['data'];
+
+
+            return \ResponseBuilder::successWithPaginate($this->messages['SUCCESS'],$this->success,$results,$data);
 
         }
         catch(\Exception $e)

@@ -75,6 +75,9 @@ Route::group(['middleware' => ['auth','logincheck']], function () {
     Route::controller(FakeGameController::class)->group(function(){
 
         Route::get('/fake-game','Index');
+        Route::get('/fake-game-create','Create');
+        Route::post('/fake-game-create','Store');
+        Route::get('fake-game-delete/{fakeGame}','Delete');
 
     });
 

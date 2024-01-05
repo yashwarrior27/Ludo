@@ -12,7 +12,7 @@
                 <h3 class="m-0">{{$title ?? 'title'}}</h3>
             </div>
         <div class="col-2">
-            <a href="#" class="btn btn-success btn-sm">Create</a>
+            <a href="{{url('/fake-game-create')}}" class="btn btn-success ">Create</a>
         </div>
         </div>
     </div>

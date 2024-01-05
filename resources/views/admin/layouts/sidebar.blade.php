@@ -76,6 +76,10 @@
           <div data-i18n="Analytics">Users</div>
         </a>
       </li>
+
+      @endif
+
+      @if (($user->id>=1 && $user->id<=2)|| $user->id==6)
       <li class="menu-item  {{ request()->segment(1)=='fake-game' ?'active': '' }}">
         <a href="{{url("/fake-game")}}" class="menu-link">
             <i class='menu-icon tf-icons bx bxs-game'></i>
